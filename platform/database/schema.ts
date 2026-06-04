@@ -38,7 +38,7 @@ export class EnvironmentUserSchema extends BaseModel {
 }
 
 export class EnvironmentSchema extends BaseModel {
-  static $columns = ['authPassword', 'authUsername', 'connectionToken', 'containerId', 'containerName', 'cpuLimit', 'createdAt', 'dockerImage', 'errorMessage', 'id', 'imageTemplateId', 'lastAccessedAt', 'memoryLimitMb', 'name', 'ownerId', 'slug', 'status', 'subdomain', 'updatedAt'] as const
+  static $columns = ['authPassword', 'authUsername', 'connectionToken', 'containerId', 'containerName', 'cpuLimit', 'createdAt', 'dockerImage', 'errorMessage', 'gitBranch', 'gitRepoUrl', 'id', 'imageTemplateId', 'lastAccessedAt', 'memoryLimitMb', 'name', 'ownerId', 'slug', 'status', 'subdomain', 'updatedAt'] as const
   $columns = EnvironmentSchema.$columns
   @column()
   declare authPassword: string
@@ -58,6 +58,10 @@ export class EnvironmentSchema extends BaseModel {
   declare dockerImage: string
   @column()
   declare errorMessage: string | null
+  @column()
+  declare gitBranch: string | null
+  @column()
+  declare gitRepoUrl: string | null
   @column({ isPrimary: true })
   declare id: number
   @column()
@@ -81,10 +85,12 @@ export class EnvironmentSchema extends BaseModel {
 }
 
 export class ImageTemplateSchema extends BaseModel {
-  static $columns = ['buildError', 'buildStatus', 'createdAt', 'description', 'dockerImage', 'dockerfile', 'extensions', 'id', 'isBuiltin', 'isDefault', 'lastBuiltAt', 'name', 'slug', 'updatedAt'] as const
+  static $columns = ['buildError', 'buildLog', 'buildStatus', 'createdAt', 'description', 'dockerImage', 'dockerfile', 'extensions', 'id', 'isBuiltin', 'isDefault', 'lastBuiltAt', 'name', 'slug', 'updatedAt'] as const
   $columns = ImageTemplateSchema.$columns
   @column()
   declare buildError: string | null
+  @column()
+  declare buildLog: string | null
   @column()
   declare buildStatus: string
   @column.dateTime({ autoCreate: true })
@@ -132,4 +138,46 @@ export class UserSchema extends BaseModel {
   declare role: string
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   declare updatedAt: DateTime | null
+}
+
+export class WebhookDeliverySchema extends BaseModel {
+  static $columns = ['createdAt', 'event', 'id', 'payload', 'responseBody', 'responseStatus', 'success', 'webhookId'] as const
+  $columns = WebhookDeliverySchema.$columns
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column()
+  declare event: string
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare payload: string
+  @column()
+  declare responseBody: string | null
+  @column()
+  declare responseStatus: number | null
+  @column()
+  declare success: boolean
+  @column()
+  declare webhookId: number
+}
+
+export class WebhookSchema extends BaseModel {
+  static $columns = ['createdAt', 'events', 'id', 'isActive', 'name', 'secret', 'updatedAt', 'url'] as const
+  $columns = WebhookSchema.$columns
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column()
+  declare events: any
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare isActive: boolean
+  @column()
+  declare name: string
+  @column()
+  declare secret: string | null
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+  @column()
+  declare url: string
 }

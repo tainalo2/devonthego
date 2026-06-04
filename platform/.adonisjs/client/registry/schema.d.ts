@@ -139,6 +139,30 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/environments_controller').default['show']>>>
     }
   }
+  'environments.edit': {
+    methods: ["GET","HEAD"]
+    pattern: '/environments/:id/edit'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/environments_controller').default['edit']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/environments_controller').default['edit']>>>
+    }
+  }
+  'environments.update': {
+    methods: ["PUT"]
+    pattern: '/environments/:id'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/environment').updateEnvironmentValidator)>>
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/environment').updateEnvironmentValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/environments_controller').default['update']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/environments_controller').default['update']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
   'environments.start': {
     methods: ["POST"]
     pattern: '/environments/:id/start'
@@ -355,6 +379,18 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/image_templates_controller').default['build']>>>
     }
   }
+  'images.buildStatus': {
+    methods: ["GET","HEAD"]
+    pattern: '/images/:id/build-status'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/image_templates_controller').default['buildStatus']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/image_templates_controller').default['buildStatus']>>>
+    }
+  }
   'images.destroy': {
     methods: ["DELETE"]
     pattern: '/images/:id'
@@ -365,6 +401,90 @@ export interface Registry {
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/image_templates_controller').default['destroy']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/image_templates_controller').default['destroy']>>>
+    }
+  }
+  'webhooks.index': {
+    methods: ["GET","HEAD"]
+    pattern: '/webhooks'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/webhooks_controller').default['index']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/webhooks_controller').default['index']>>>
+    }
+  }
+  'webhooks.create': {
+    methods: ["GET","HEAD"]
+    pattern: '/webhooks/create'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/webhooks_controller').default['create']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/webhooks_controller').default['create']>>>
+    }
+  }
+  'webhooks.store': {
+    methods: ["POST"]
+    pattern: '/webhooks'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/webhook').createWebhookValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/webhook').createWebhookValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/webhooks_controller').default['store']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/webhooks_controller').default['store']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'webhooks.show': {
+    methods: ["GET","HEAD"]
+    pattern: '/webhooks/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/webhooks_controller').default['show']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/webhooks_controller').default['show']>>>
+    }
+  }
+  'webhooks.edit': {
+    methods: ["GET","HEAD"]
+    pattern: '/webhooks/:id/edit'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/webhooks_controller').default['edit']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/webhooks_controller').default['edit']>>>
+    }
+  }
+  'webhooks.update': {
+    methods: ["PUT"]
+    pattern: '/webhooks/:id'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/webhook').updateWebhookValidator)>>
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/webhook').updateWebhookValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/webhooks_controller').default['update']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/webhooks_controller').default['update']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'webhooks.destroy': {
+    methods: ["DELETE"]
+    pattern: '/webhooks/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/webhooks_controller').default['destroy']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/webhooks_controller').default['destroy']>>>
     }
   }
   'settings.index': {

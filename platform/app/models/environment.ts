@@ -55,6 +55,12 @@ export default class Environment extends BaseModel {
   @column()
   declare imageTemplateId: number | null
 
+  @column()
+  declare gitRepoUrl: string | null
+
+  @column()
+  declare gitBranch: string | null
+
   @column.dateTime()
   declare lastAccessedAt: DateTime | null
 

@@ -1,3 +1,5 @@
+import { useEffect, useState } from 'react'
+import { router } from '@inertiajs/react'
 import AppLayout from '~/layouts/app'
 import { Form, Link } from '@adonisjs/inertia/react'
 
@@ -12,6 +14,7 @@ type Template = {
   isBuiltin: boolean
   buildStatus: string
   buildError: string | null
+  buildLog: string | null
   lastBuiltAt: string | null
   createdAt: string
 }
@@ -20,7 +23,34 @@ type Props = {
   template: Template
 }
 
-export default function ImagesShow({ template }: Props) {
+export default function ImagesShow({ template: initial }: Props) {
+  const [template, setTemplate] = useState(initial)
+
+  useEffect(() => {
+    setTemplate(initial)
+  }, [initial])
+
+  useEffect(() => {
+    if (template.buildStatus !== 'building') return
+
+    const interval = setInterval(async () => {
+      try {
+        const res = await fetch(`/images/${template.id}/build-status`)
+        if (!res.ok) return
+        const data = await res.json()
+        setTemplate((prev) => ({ ...prev, ...data }))
+
+        if (data.buildStatus !== 'building') {
+          router.reload({ only: ['template'] })
+        }
+      } catch {
+        // ignore polling errors
+      }
+    }, 2000)
+
+    return () => clearInterval(interval)
+  }, [template.id, template.buildStatus])
+
   return (
     <AppLayout>
       <div className="page">
@@ -47,6 +77,9 @@ export default function ImagesShow({ template }: Props) {
                 <dt>Statut</dt>
                 <dd>
                   <span className={`badge badge-${template.buildStatus}`}>{template.buildStatus}</span>
+                  {template.buildStatus === 'building' && (
+                    <span className="muted small"> — actualisation auto…</span>
+                  )}
                 </dd>
               </div>
               {template.lastBuiltAt && (
@@ -64,7 +97,11 @@ export default function ImagesShow({ template }: Props) {
             </dl>
 
             <Form route="images.build" routeParams={{ id: template.id }}>
-              <button type="submit" className="btn btn-primary" disabled={template.buildStatus === 'building'}>
+              <button
+                type="submit"
+                className="btn btn-primary"
+                disabled={template.buildStatus === 'building'}
+              >
                 {template.buildStatus === 'building' ? 'Build en cours…' : 'Lancer le build Docker'}
               </button>
             </Form>
@@ -88,6 +125,13 @@ export default function ImagesShow({ template }: Props) {
             </dl>
           </section>
         </div>
+
+        {template.buildLog && (
+          <section className="card">
+            <h2>Journal de build</h2>
+            <pre className="docker-logs">{template.buildLog}</pre>
+          </section>
+        )}
 
         {template.dockerfile && (
           <section className="card">

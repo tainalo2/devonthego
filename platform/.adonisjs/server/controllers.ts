@@ -11,4 +11,5 @@ export const controllers = {
   Session: () => import('#controllers/session_controller'),
   Settings: () => import('#controllers/settings_controller'),
   Users: () => import('#controllers/users_controller'),
+  Webhooks: () => import('#controllers/webhooks_controller'),
 }

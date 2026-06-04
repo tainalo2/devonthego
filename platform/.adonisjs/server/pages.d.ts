@@ -16,6 +16,7 @@ declare module '@adonisjs/inertia/types' {
     'auth/signup': ExtractProps<(typeof import('../../inertia/pages/auth/signup.tsx'))['default']>
     'dashboard/index': ExtractProps<(typeof import('../../inertia/pages/dashboard/index.tsx'))['default']>
     'environments/create': ExtractProps<(typeof import('../../inertia/pages/environments/create.tsx'))['default']>
+    'environments/edit': ExtractProps<(typeof import('../../inertia/pages/environments/edit.tsx'))['default']>
     'environments/index': ExtractProps<(typeof import('../../inertia/pages/environments/index.tsx'))['default']>
     'environments/show': ExtractProps<(typeof import('../../inertia/pages/environments/show.tsx'))['default']>
     'errors/not_found': ExtractProps<(typeof import('../../inertia/pages/errors/not_found.tsx'))['default']>
@@ -29,5 +30,9 @@ declare module '@adonisjs/inertia/types' {
     'users/create': ExtractProps<(typeof import('../../inertia/pages/users/create.tsx'))['default']>
     'users/edit': ExtractProps<(typeof import('../../inertia/pages/users/edit.tsx'))['default']>
     'users/index': ExtractProps<(typeof import('../../inertia/pages/users/index.tsx'))['default']>
+    'webhooks/create': ExtractProps<(typeof import('../../inertia/pages/webhooks/create.tsx'))['default']>
+    'webhooks/edit': ExtractProps<(typeof import('../../inertia/pages/webhooks/edit.tsx'))['default']>
+    'webhooks/index': ExtractProps<(typeof import('../../inertia/pages/webhooks/index.tsx'))['default']>
+    'webhooks/show': ExtractProps<(typeof import('../../inertia/pages/webhooks/show.tsx'))['default']>
   }
 }

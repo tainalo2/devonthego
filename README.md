@@ -81,8 +81,15 @@ chmod +x images/build-image.sh
 
 | Rôle | Permissions |
 |------|-------------|
-| **admin** | Gestion utilisateurs, images, tous les environnements |
+| **admin** | Gestion utilisateurs, images, webhooks, tous les environnements |
 | **user** | Ses environnements et ceux partagés avec lui |
+
+## Fonctionnalités
+
+- **Build d'images async** — lancement en arrière-plan avec journal et polling UI
+- **Édition d'environnements** — nom, CPU, RAM (recréation conteneur si nécessaire)
+- **Import Git** — clone automatique au démarrage si workspace vide
+- **Webhooks** — notifications HTTP signées (HMAC SHA-256) sur changements de statut
 
 ## Persistance
 

@@ -15,6 +15,8 @@ type Environment = {
   owner: { id: number; email: string; fullName: string | null }
   imageTemplate: { id: number; name: string } | null
   assignedUsers: { id: number; email: string; fullName: string | null }[]
+  gitRepoUrl: string | null
+  gitBranch: string | null
   createdAt: string
 }
 
@@ -58,7 +60,14 @@ export default function EnvironmentShow({
             <h1>{environment.name}</h1>
             <p className="muted">{environment.slug}</p>
           </div>
-          <Link route="environments.index">Retour</Link>
+          <div className="actions-row">
+            {canManage && (
+              <Link route="environments.edit" routeParams={{ id: environment.id }} className="btn">
+                Modifier
+              </Link>
+            )}
+            <Link route="environments.index">Retour</Link>
+          </div>
         </div>
 
         <div className="detail-grid">
@@ -99,6 +108,21 @@ export default function EnvironmentShow({
                   )}
                 </dd>
               </div>
+              {(environment.gitRepoUrl || environment.gitBranch) && (
+                <div>
+                  <dt>Git</dt>
+                  <dd>
+                    {environment.gitRepoUrl && (
+                      <div>
+                        <code>{environment.gitRepoUrl}</code>
+                      </div>
+                    )}
+                    {environment.gitBranch && (
+                      <span className="muted">branche : {environment.gitBranch}</span>
+                    )}
+                  </dd>
+                </div>
+              )}
               <div>
                 <dt>Ressources</dt>
                 <dd>

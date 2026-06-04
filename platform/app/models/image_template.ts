@@ -37,6 +37,9 @@ export default class ImageTemplate extends BaseModel {
   @column()
   declare buildError: string | null
 
+  @column()
+  declare buildLog: string | null
+
   @column.dateTime()
   declare lastBuiltAt: DateTime | null
 

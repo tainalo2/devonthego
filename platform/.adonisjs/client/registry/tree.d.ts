@@ -20,6 +20,8 @@ export interface ApiDefinition {
     create: typeof routes['environments.create']
     store: typeof routes['environments.store']
     show: typeof routes['environments.show']
+    edit: typeof routes['environments.edit']
+    update: typeof routes['environments.update']
     start: typeof routes['environments.start']
     stop: typeof routes['environments.stop']
     regenerateCredentials: typeof routes['environments.regenerateCredentials']
@@ -42,7 +44,17 @@ export interface ApiDefinition {
     edit: typeof routes['images.edit']
     update: typeof routes['images.update']
     build: typeof routes['images.build']
+    buildStatus: typeof routes['images.buildStatus']
     destroy: typeof routes['images.destroy']
+  }
+  webhooks: {
+    index: typeof routes['webhooks.index']
+    create: typeof routes['webhooks.create']
+    store: typeof routes['webhooks.store']
+    show: typeof routes['webhooks.show']
+    edit: typeof routes['webhooks.edit']
+    update: typeof routes['webhooks.update']
+    destroy: typeof routes['webhooks.destroy']
   }
   settings: {
     index: typeof routes['settings.index']

@@ -72,6 +72,18 @@ const routes = {
     tokens: [{"old":"/environments/:id","type":0,"val":"environments","end":""},{"old":"/environments/:id","type":1,"val":"id","end":""}],
     types: placeholder as Registry['environments.show']['types'],
   },
+  'environments.edit': {
+    methods: ["GET","HEAD"],
+    pattern: '/environments/:id/edit',
+    tokens: [{"old":"/environments/:id/edit","type":0,"val":"environments","end":""},{"old":"/environments/:id/edit","type":1,"val":"id","end":""},{"old":"/environments/:id/edit","type":0,"val":"edit","end":""}],
+    types: placeholder as Registry['environments.edit']['types'],
+  },
+  'environments.update': {
+    methods: ["PUT"],
+    pattern: '/environments/:id',
+    tokens: [{"old":"/environments/:id","type":0,"val":"environments","end":""},{"old":"/environments/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['environments.update']['types'],
+  },
   'environments.start': {
     methods: ["POST"],
     pattern: '/environments/:id/start',
@@ -180,11 +192,59 @@ const routes = {
     tokens: [{"old":"/images/:id/build","type":0,"val":"images","end":""},{"old":"/images/:id/build","type":1,"val":"id","end":""},{"old":"/images/:id/build","type":0,"val":"build","end":""}],
     types: placeholder as Registry['images.build']['types'],
   },
+  'images.buildStatus': {
+    methods: ["GET","HEAD"],
+    pattern: '/images/:id/build-status',
+    tokens: [{"old":"/images/:id/build-status","type":0,"val":"images","end":""},{"old":"/images/:id/build-status","type":1,"val":"id","end":""},{"old":"/images/:id/build-status","type":0,"val":"build-status","end":""}],
+    types: placeholder as Registry['images.buildStatus']['types'],
+  },
   'images.destroy': {
     methods: ["DELETE"],
     pattern: '/images/:id',
     tokens: [{"old":"/images/:id","type":0,"val":"images","end":""},{"old":"/images/:id","type":1,"val":"id","end":""}],
     types: placeholder as Registry['images.destroy']['types'],
+  },
+  'webhooks.index': {
+    methods: ["GET","HEAD"],
+    pattern: '/webhooks',
+    tokens: [{"old":"/webhooks","type":0,"val":"webhooks","end":""}],
+    types: placeholder as Registry['webhooks.index']['types'],
+  },
+  'webhooks.create': {
+    methods: ["GET","HEAD"],
+    pattern: '/webhooks/create',
+    tokens: [{"old":"/webhooks/create","type":0,"val":"webhooks","end":""},{"old":"/webhooks/create","type":0,"val":"create","end":""}],
+    types: placeholder as Registry['webhooks.create']['types'],
+  },
+  'webhooks.store': {
+    methods: ["POST"],
+    pattern: '/webhooks',
+    tokens: [{"old":"/webhooks","type":0,"val":"webhooks","end":""}],
+    types: placeholder as Registry['webhooks.store']['types'],
+  },
+  'webhooks.show': {
+    methods: ["GET","HEAD"],
+    pattern: '/webhooks/:id',
+    tokens: [{"old":"/webhooks/:id","type":0,"val":"webhooks","end":""},{"old":"/webhooks/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['webhooks.show']['types'],
+  },
+  'webhooks.edit': {
+    methods: ["GET","HEAD"],
+    pattern: '/webhooks/:id/edit',
+    tokens: [{"old":"/webhooks/:id/edit","type":0,"val":"webhooks","end":""},{"old":"/webhooks/:id/edit","type":1,"val":"id","end":""},{"old":"/webhooks/:id/edit","type":0,"val":"edit","end":""}],
+    types: placeholder as Registry['webhooks.edit']['types'],
+  },
+  'webhooks.update': {
+    methods: ["PUT"],
+    pattern: '/webhooks/:id',
+    tokens: [{"old":"/webhooks/:id","type":0,"val":"webhooks","end":""},{"old":"/webhooks/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['webhooks.update']['types'],
+  },
+  'webhooks.destroy': {
+    methods: ["DELETE"],
+    pattern: '/webhooks/:id',
+    tokens: [{"old":"/webhooks/:id","type":0,"val":"webhooks","end":""},{"old":"/webhooks/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['webhooks.destroy']['types'],
   },
   'settings.index': {
     methods: ["GET","HEAD"],

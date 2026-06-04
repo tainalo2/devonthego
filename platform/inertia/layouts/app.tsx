@@ -46,6 +46,7 @@ export default function AppLayout({ children }: { children: ReactElement<Data.Sh
                     <>
                       {navLink('/users', 'Utilisateurs')}
                       {navLink('/images', 'Images')}
+                      {navLink('/webhooks', 'Webhooks')}
                       {navLink('/settings', 'Paramètres')}
                     </>
                   )}

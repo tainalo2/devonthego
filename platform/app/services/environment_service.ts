@@ -6,8 +6,10 @@ import EnvironmentLog from '#models/environment_log'
 import ImageTemplate from '#models/image_template'
 import User from '#models/user'
 import DockerService from '#services/docker_service'
+import GitService from '#services/git_service'
 import SlugService from '#services/slug_service'
 import TraefikAuthService from '#services/traefik_auth_service'
+import WebhookService, { type WebhookEvent } from '#services/webhook_service'
 
 export type CreateEnvironmentInput = {
   name: string
@@ -17,10 +19,24 @@ export type CreateEnvironmentInput = {
   cpuLimit?: number
   memoryLimitMb?: number
   assignedUserIds?: number[]
+  gitRepoUrl?: string | null
+  gitBranch?: string | null
+}
+
+export type UpdateEnvironmentInput = {
+  name?: string
+  cpuLimit?: number
+  memoryLimitMb?: number
+  gitRepoUrl?: string | null
+  gitBranch?: string | null
 }
 
 export default class EnvironmentService {
-  constructor(protected docker = new DockerService()) {}
+  constructor(
+    protected docker = new DockerService(),
+    protected git = new GitService(),
+    protected webhooks = new WebhookService()
+  ) {}
 
   async create(input: CreateEnvironmentInput): Promise<Environment> {
     const owner = await User.findOrFail(input.ownerId)
@@ -56,6 +72,8 @@ export default class EnvironmentService {
       memoryLimitMb: input.memoryLimitMb ?? 1024,
       ownerId: owner.id,
       imageTemplateId: input.imageTemplateId ?? null,
+      gitRepoUrl: input.gitRepoUrl ?? null,
+      gitBranch: input.gitBranch ?? null,
     })
 
     if (input.assignedUserIds?.length) {
@@ -67,19 +85,59 @@ export default class EnvironmentService {
     await this.log(environment.id, 'info', `Création de l'environnement « ${environment.name} »`)
 
     try {
+      await this.prepareWorkspace(environment)
       const container = await this.startContainer(environment, authPassword)
       environment.containerId = container.id
       environment.containerName = container.name
       environment.status = 'running'
       await environment.save()
       await this.log(environment.id, 'info', 'Conteneur démarré avec succès')
+      await this.notify('environment.created', environment)
+      await this.notify('environment.started', environment)
     } catch (error) {
       environment.status = 'error'
       environment.errorMessage = error instanceof Error ? error.message : String(error)
       await environment.save()
       await this.log(environment.id, 'error', environment.errorMessage)
+      await this.notify('environment.error', environment)
       throw error
     }
+
+    return environment
+  }
+
+  async update(environment: Environment, input: UpdateEnvironmentInput): Promise<Environment> {
+    const previousStatus = environment.status
+    const needsRecreate =
+      (input.cpuLimit !== undefined && input.cpuLimit !== environment.cpuLimit) ||
+      (input.memoryLimitMb !== undefined && input.memoryLimitMb !== environment.memoryLimitMb)
+
+    const wasRunning = environment.status === 'running'
+
+    environment.merge({
+      name: input.name ?? environment.name,
+      cpuLimit: input.cpuLimit ?? environment.cpuLimit,
+      memoryLimitMb: input.memoryLimitMb ?? environment.memoryLimitMb,
+      gitRepoUrl: input.gitRepoUrl !== undefined ? input.gitRepoUrl : environment.gitRepoUrl,
+      gitBranch: input.gitBranch !== undefined ? input.gitBranch : environment.gitBranch,
+    })
+    await environment.save()
+
+    if (needsRecreate && environment.containerId) {
+      await this.log(environment.id, 'info', 'Recréation du conteneur (changement de ressources)')
+      await this.docker.removeContainer(environment.containerId)
+      environment.containerId = null
+      environment.containerName = null
+      await environment.save()
+
+      if (wasRunning) {
+        await this.prepareWorkspace(environment)
+        await this.start(environment)
+      }
+    }
+
+    await this.log(environment.id, 'info', 'Environnement mis à jour')
+    await this.notify('environment.updated', environment, { previousStatus })
 
     return environment
   }
@@ -91,15 +149,18 @@ export default class EnvironmentService {
       environment.status = 'running'
       await environment.save()
       await this.log(environment.id, 'info', 'Environnement démarré')
+      await this.notify('environment.started', environment)
       return environment
     }
 
+    await this.prepareWorkspace(environment)
     const authPassword = encryption.decrypt(environment.authPassword) as string
     const container = await this.startContainer(environment, authPassword)
     environment.containerId = container.id
     environment.containerName = container.name
     environment.status = 'running'
     await environment.save()
+    await this.notify('environment.started', environment)
     return environment
   }
 
@@ -107,6 +168,7 @@ export default class EnvironmentService {
     if (!environment.containerId) {
       environment.status = 'stopped'
       await environment.save()
+      await this.notify('environment.stopped', environment)
       return environment
     }
 
@@ -115,6 +177,7 @@ export default class EnvironmentService {
     environment.status = 'stopped'
     await environment.save()
     await this.log(environment.id, 'info', 'Environnement arrêté')
+    await this.notify('environment.stopped', environment)
     return environment
   }
 
@@ -127,6 +190,7 @@ export default class EnvironmentService {
     }
 
     await this.log(environment.id, 'info', 'Environnement supprimé')
+    await this.notify('environment.deleted', environment)
     await environment.delete()
   }
 
@@ -135,15 +199,27 @@ export default class EnvironmentService {
       return environment
     }
 
+    const previousStatus = environment.status
+
     try {
       const info = await this.docker.inspectContainer(environment.containerId)
       environment.status = info.State.Running ? 'running' : 'stopped'
       environment.errorMessage = null
       await environment.save()
+
+      if (previousStatus !== environment.status) {
+        const event: WebhookEvent =
+          environment.status === 'running' ? 'environment.started' : 'environment.stopped'
+        await this.notify(event, environment, { previousStatus })
+      }
     } catch {
       environment.status = 'error'
       environment.errorMessage = 'Conteneur introuvable'
       await environment.save()
+
+      if (previousStatus !== 'error') {
+        await this.notify('environment.error', environment, { previousStatus })
+      }
     }
 
     return environment
@@ -213,6 +289,19 @@ export default class EnvironmentService {
     return encryption.decrypt(environment.authPassword) as string
   }
 
+  protected async prepareWorkspace(environment: Environment) {
+    const workspacePath = `${dockerConfig.workspacePath}/${environment.slug}`
+
+    if (environment.gitRepoUrl) {
+      const result = await this.git.cloneIntoWorkspace(
+        workspacePath,
+        environment.gitRepoUrl,
+        environment.gitBranch
+      )
+      await this.log(environment.id, 'info', result.message)
+    }
+  }
+
   protected async startContainer(environment: Environment, authPassword: string) {
     const containerName = `dotg-env-${environment.slug}`
     const hostRule = `Host(\`${environment.subdomain}.${dockerConfig.domain}\`)`
@@ -222,10 +311,18 @@ export default class EnvironmentService {
     const middlewareName = `env-${environment.slug}-auth`
     const workspaceVolume = `${dockerConfig.workspacePath}/${environment.slug}`
 
+    const envVars = [`CONNECTION_TOKEN=${environment.connectionToken}`]
+    if (environment.gitRepoUrl) {
+      envVars.push(`GIT_REPO_URL=${environment.gitRepoUrl}`)
+    }
+    if (environment.gitBranch) {
+      envVars.push(`GIT_BRANCH=${environment.gitBranch}`)
+    }
+
     const container = await this.docker.client.createContainer({
       name: containerName,
       Image: environment.dockerImage,
-      Env: [`CONNECTION_TOKEN=${environment.connectionToken}`],
+      Env: envVars,
       HostConfig: {
         NetworkMode: dockerConfig.network,
         Binds: [`${workspaceVolume}:/home/workspace`],
@@ -251,6 +348,25 @@ export default class EnvironmentService {
     const inspect = await container.inspect()
 
     return { id: inspect.Id, name: inspect.Name.replace(/^\//, '') }
+  }
+
+  protected async notify(
+    event: WebhookEvent,
+    environment: Environment,
+    extra: Record<string, unknown> = {}
+  ) {
+    await this.webhooks.dispatch(event, {
+      environment: {
+        id: environment.id,
+        name: environment.name,
+        slug: environment.slug,
+        status: environment.status,
+        subdomain: environment.subdomain,
+        url: this.getPublicUrl(environment),
+        ownerId: environment.ownerId,
+      },
+      ...extra,
+    })
   }
 
   protected async log(environmentId: number, level: 'info' | 'warn' | 'error', message: string) {

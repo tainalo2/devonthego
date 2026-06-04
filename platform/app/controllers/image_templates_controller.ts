@@ -22,6 +22,7 @@ export default class ImageTemplatesController {
         isBuiltin: template.isBuiltin,
         buildStatus: template.buildStatus,
         buildError: template.buildError,
+        buildLog: template.buildLog,
         lastBuiltAt: template.lastBuiltAt?.toISO() ?? null,
         createdAt: template.createdAt.toISO() ?? '',
       })),
@@ -72,6 +73,7 @@ export default class ImageTemplatesController {
         isBuiltin: template.isBuiltin,
         buildStatus: template.buildStatus,
         buildError: template.buildError,
+        buildLog: template.buildLog,
         lastBuiltAt: template.lastBuiltAt?.toISO() ?? null,
         createdAt: template.createdAt.toISO() ?? '',
       },
@@ -116,19 +118,29 @@ export default class ImageTemplatesController {
 
   async build({ response, params, session }: HttpContext) {
     const template = await ImageTemplate.findOrFail(params.id)
-    const builder = new ImageBuilderService()
 
-    try {
-      await builder.build(template)
-      session.flash('success', `Image « ${template.name} » construite et poussée vers le registry.`)
-    } catch (error) {
-      session.flash(
-        'error',
-        error instanceof Error ? error.message : 'Échec du build Docker.'
-      )
+    if (template.buildStatus === 'building') {
+      session.flash('error', 'Un build est déjà en cours.')
+      return response.redirect().toRoute('images.show', { id: template.id })
     }
 
+    const builder = new ImageBuilderService()
+    builder.startBuildAsync(template.id)
+
+    session.flash('success', `Build « ${template.name} » lancé en arrière-plan.`)
     return response.redirect().toRoute('images.show', { id: template.id })
+  }
+
+  async buildStatus({ params, response }: HttpContext) {
+    const template = await ImageTemplate.findOrFail(params.id)
+
+    return response.json({
+      id: template.id,
+      buildStatus: template.buildStatus,
+      buildError: template.buildError,
+      buildLog: template.buildLog,
+      lastBuiltAt: template.lastBuiltAt?.toISO() ?? null,
+    })
   }
 
   async destroy({ response, params, session }: HttpContext) {

@@ -106,6 +106,26 @@ export default function EnvironmentsCreate({ templates, users, defaults }: Props
                   </label>
                 </div>
 
+                <fieldset className="checkbox-group">
+                  <legend>Import Git (optionnel)</legend>
+                  <label>
+                    URL du dépôt
+                    <input
+                      type="url"
+                      name="gitRepoUrl"
+                      placeholder="https://github.com/user/mon-projet.git"
+                    />
+                    {errors.gitRepoUrl && <span className="error">{errors.gitRepoUrl}</span>}
+                  </label>
+                  <label>
+                    Branche
+                    <input type="text" name="gitBranch" placeholder="main" />
+                  </label>
+                  <p className="muted small">
+                    Le dépôt sera cloné dans le workspace au premier démarrage (si vide).
+                  </p>
+                </fieldset>
+
                 <button type="submit" className="btn btn-primary">
                   Créer l&apos;environnement
                 </button>

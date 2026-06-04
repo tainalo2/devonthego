@@ -39,6 +39,14 @@ router
     router.post('environments', [controllers.Environments, 'store']).as('environments.store')
     router.get('environments/:id', [controllers.Environments, 'show']).as('environments.show')
     router
+      .get('environments/:id/edit', [controllers.Environments, 'edit'])
+      .use(middleware.canManageEnvironment())
+      .as('environments.edit')
+    router
+      .put('environments/:id', [controllers.Environments, 'update'])
+      .use(middleware.canManageEnvironment())
+      .as('environments.update')
+    router
       .post('environments/:id/start', [controllers.Environments, 'start'])
       .use(middleware.canManageEnvironment())
       .as('environments.start')
@@ -78,7 +86,18 @@ router
         router.get('images/:id/edit', [controllers.ImageTemplates, 'edit']).as('images.edit')
         router.put('images/:id', [controllers.ImageTemplates, 'update']).as('images.update')
         router.post('images/:id/build', [controllers.ImageTemplates, 'build']).as('images.build')
+        router
+          .get('images/:id/build-status', [controllers.ImageTemplates, 'buildStatus'])
+          .as('images.buildStatus')
         router.delete('images/:id', [controllers.ImageTemplates, 'destroy']).as('images.destroy')
+
+        router.get('webhooks', [controllers.Webhooks, 'index']).as('webhooks.index')
+        router.get('webhooks/create', [controllers.Webhooks, 'create']).as('webhooks.create')
+        router.post('webhooks', [controllers.Webhooks, 'store']).as('webhooks.store')
+        router.get('webhooks/:id', [controllers.Webhooks, 'show']).as('webhooks.show')
+        router.get('webhooks/:id/edit', [controllers.Webhooks, 'edit']).as('webhooks.edit')
+        router.put('webhooks/:id', [controllers.Webhooks, 'update']).as('webhooks.update')
+        router.delete('webhooks/:id', [controllers.Webhooks, 'destroy']).as('webhooks.destroy')
 
         router.get('settings', [controllers.Settings, 'index']).as('settings.index')
       })
