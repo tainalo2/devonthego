@@ -1,0 +1,38 @@
+# Overlay bootstrap — HTTPS autosigné sur le port 8443 (Traefik).
+# docker compose -f docker-compose.yml -f docker-compose.bootstrap.yml up -d
+
+services:
+  traefik:
+    ports: !override
+      - '8443:8443'
+    command: !override
+      - --log.level=INFO
+      - --api.dashboard=false
+      - --providers.docker=true
+      - --providers.docker.exposedbydefault=false
+      - --providers.docker.network=devonthego
+      - --providers.file.directory=/etc/traefik/dynamic
+      - --providers.file.watch=true
+      - --entrypoints.bootstrap.address=:8443
+      - --entrypoints.bootstrap.http.tls=true
+    volumes: !override
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ${DOTG_INSTALL_DIR:-.}/certs/bootstrap:/certs:ro
+      - ${DOTG_INSTALL_DIR:-.}/traefik/bootstrap.tls.yml:/etc/traefik/dynamic/tls.yml:ro
+
+  platform:
+    ports: !override []
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - platform-data:/app/data
+      - env-workspaces:/data/workspaces
+      - ${DOTG_INSTALL_DIR:-.}:/install:rw
+    labels: !override
+      - traefik.enable=true
+      - traefik.http.routers.platform-bootstrap.rule=PathPrefix(`/`)
+      - traefik.http.routers.platform-bootstrap.entrypoints=bootstrap
+      - traefik.http.routers.platform-bootstrap.tls=true
+      - traefik.http.routers.platform-bootstrap.service=platform-bootstrap
+      - traefik.http.services.platform-bootstrap.loadbalancer.server.port=3333
+    environment:
+      DOTG_INSTALL_DIR: /install

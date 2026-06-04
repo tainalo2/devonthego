@@ -1,0 +1,85 @@
+import User from '#models/user'
+import ImageTemplate from '#models/image_template'
+import env from '#start/env'
+import { BaseSeeder } from '@adonisjs/lucid/seeders'
+
+export default class extends BaseSeeder {
+  async run() {
+    const templates = [
+      {
+        name: 'Base',
+        slug: 'base',
+        dockerImage: 'devonthego/base:latest',
+        description: null,
+        isDefault: true,
+        isBuiltin: true,
+        buildStatus: 'idle' as const,
+      },
+      {
+        name: 'Node.js',
+        slug: 'node',
+        dockerImage: 'devonthego/custom:node-latest',
+        description: null,
+        isDefault: false,
+        isBuiltin: true,
+        buildStatus: 'idle' as const,
+      },
+      {
+        name: 'Python',
+        slug: 'python',
+        dockerImage: 'devonthego/custom:python-latest',
+        description: null,
+        isDefault: false,
+        isBuiltin: true,
+        buildStatus: 'idle' as const,
+      },
+      {
+        name: 'PHP',
+        slug: 'php',
+        dockerImage: 'devonthego/custom:php-latest',
+        description: null,
+        isDefault: false,
+        isBuiltin: true,
+        buildStatus: 'idle' as const,
+      },
+    ]
+
+    for (const template of templates) {
+      await ImageTemplate.updateOrCreate({ slug: template.slug }, template)
+    }
+
+    const bootstrapEmail = env.get('BOOTSTRAP_ADMIN_EMAIL')
+    const bootstrapPassword = env.get('BOOTSTRAP_ADMIN_PASSWORD')
+    const bootstrapMode = env.get('BOOTSTRAP_MODE', false)
+
+    if (bootstrapMode && bootstrapEmail && bootstrapPassword) {
+      const existing = await User.findBy('email', bootstrapEmail)
+      if (!existing) {
+        await User.create({
+          email: bootstrapEmail,
+          password: bootstrapPassword,
+          fullName: 'Bootstrap Admin',
+          role: 'admin',
+          isActive: true,
+        })
+      }
+      return
+    }
+
+    const adminEmail = env.get('ADMIN_EMAIL')
+    const adminPassword = env.get('ADMIN_PASSWORD')
+
+    if (adminEmail && adminPassword) {
+      const existing = await User.findBy('email', adminEmail)
+      if (!existing) {
+        await User.create({
+          email: adminEmail,
+          password: adminPassword,
+          fullName: env.get('ADMIN_FULL_NAME') ?? 'Administrator',
+          role: 'admin',
+          isActive: true,
+        })
+      }
+    }
+  }
+}

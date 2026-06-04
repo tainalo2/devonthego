@@ -1,0 +1,365 @@
+{
+  "app": {
+    "name": "Dev on the go",
+    "tagline": "Containerized development environments with VS Code in the browser. Deploy, code, and collaborate from anywhere."
+  },
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "back": "Back",
+    "delete": "Delete",
+    "edit": "Edit",
+    "create": "Create",
+    "details": "Details",
+    "email": "Email",
+    "password": "Password",
+    "name": "Name",
+    "fullName": "Full name",
+    "language": "Language",
+    "yes": "Yes",
+    "no": "No",
+    "none": "None",
+    "actions": "Actions",
+    "loading": "Loading…",
+    "open": "Open",
+    "description": "Description",
+    "status": "Status",
+    "url": "URL",
+    "owner": "Owner",
+    "resources": "Resources",
+    "active": "Active",
+    "role": "Role",
+    "previous": "Previous",
+    "next": "Next",
+    "confirm": "Confirm",
+    "optional": "optional",
+    "required": "Required",
+    "error": "Error",
+    "success": "Success",
+    "online": "Online",
+    "offline": "Offline",
+    "custom": "Custom",
+    "branch": "Branch",
+    "user": "User",
+    "username": "Username",
+    "emDash": "—",
+    "builtin": "builtin"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "environments": "Environments",
+    "users": "Users",
+    "images": "Images",
+    "webhooks": "Webhooks",
+    "settings": "Settings",
+    "login": "Log in",
+    "signup": "Sign up",
+    "logout": "Log out"
+  },
+  "home": {
+    "title": "Dev on the go",
+    "subtitle": "Containerized development environments with VS Code in the browser. Deploy, code, and collaborate from anywhere.",
+    "login": "Log in",
+    "signup": "Create an account"
+  },
+  "auth": {
+    "login": {
+      "title": "Log in",
+      "subtitle": "Sign in to your Dev on the go workspace.",
+      "bootstrapHint": "First install? Use the credentials shown by install.sh, then follow the setup wizard.",
+      "tlsHint": "The TLS certificate is self-signed — accept the browser security warning for this first connection.",
+      "submit": "Log in",
+      "noAccount": "Don't have an account?",
+      "signupLink": "Sign up"
+    },
+    "signup": {
+      "title": "Sign up",
+      "subtitle": "Create your Dev on the go account.",
+      "passwordConfirmation": "Confirm password",
+      "submit": "Sign up",
+      "hasAccount": "Already have an account?",
+      "loginLink": "Log in"
+    }
+  },
+  "setup": {
+    "title": "Initial setup",
+    "welcome": "Welcome to Dev on the go. Complete this setup to enable HTTPS and deploy the platform in production.",
+    "bootstrapAccess": "Bootstrap access (self-signed HTTPS):",
+    "certHint": "Accept the browser certificate warning — form data is encrypted in transit.",
+    "steps": {
+      "domain": "Domain & TLS",
+      "admin": "Administrator",
+      "resources": "Resources",
+      "confirmation": "Confirmation"
+    },
+    "stepsAria": "Steps",
+    "domain": {
+      "title": "Domain & TLS certificates",
+      "hint": "The domain must point to this server (A DNS record). Let's Encrypt certificates will be generated automatically.",
+      "domainLabel": "Primary domain",
+      "acmeEmailLabel": "Let's Encrypt email",
+      "adminUrlHint": "Admin URL after setup:"
+    },
+    "admin": {
+      "title": "Administrator account",
+      "hint": "Replaces temporary bootstrap credentials with your permanent account.",
+      "allowPublicSignup": "Allow public sign-up"
+    },
+    "resources": {
+      "title": "Per-environment limits",
+      "cpuLabel": "CPU (cores)",
+      "memoryLabel": "Memory (e.g. 1024m, 2g)"
+    },
+    "confirmation": {
+      "title": "Confirmation",
+      "body": "The platform will write configuration, recreate Traefik with HTTPS, and restart. This takes about 30 seconds.",
+      "checkDns": "Verify that DNS points to this server",
+      "checkPorts": "Ports 80 and 443 must be open",
+      "checkLogout": "You will be logged out and must sign in again at the new URL"
+    },
+    "deploy": "Deploy platform",
+    "deploying": "Deploying…"
+  },
+  "setupComplete": {
+    "title": "Setup in progress",
+    "body": "The platform is restarting in production mode with TLS certificates. This takes about 30 to 60 seconds.",
+    "reconnect": "Then sign in again at:",
+    "useAdminCredentials": "Use the email and password defined in the administrator step",
+    "letsEncryptDelay": "The Let's Encrypt certificate may take an extra minute"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "newEnvironment": "New environment",
+    "stats": {
+      "environments": "Environments",
+      "running": "Running",
+      "users": "Users",
+      "docker": "Docker"
+    },
+    "recentEnvironments": "Recent environments",
+    "noEnvironments": "No environments yet.",
+    "columns": {
+      "name": "Name",
+      "status": "Status",
+      "url": "URL",
+      "owner": "Owner"
+    }
+  },
+  "environments": {
+    "title": "Environments",
+    "new": "New environment",
+    "none": "No environments.",
+    "columns": {
+      "name": "Name",
+      "status": "Status",
+      "image": "Image",
+      "owner": "Owner",
+      "resources": "Resources"
+    },
+    "create": {
+      "title": "New environment",
+      "imageTemplate": "Image template",
+      "owner": "Owner",
+      "myself": "Myself",
+      "assignedUsers": "Assigned users (shared access)",
+      "cpu": "CPU (cores)",
+      "ram": "RAM (MB)",
+      "gitImport": "Git import (optional)",
+      "gitRepoUrl": "Repository URL",
+      "gitBranch": "Branch",
+      "gitHint": "The repository will be cloned into the workspace on first start (if empty).",
+      "submit": "Create environment"
+    },
+    "edit": {
+      "title": "Edit {name}",
+      "currentStatus": "Current status:",
+      "resourceHint": "changing CPU/RAM will recreate the container if it is running.",
+      "gitRepoUrl": "Git repository URL (optional)",
+      "gitBranch": "Git branch"
+    },
+    "show": {
+      "information": "Information",
+      "dockerImage": "Docker image",
+      "assignedUsers": "Assigned users",
+      "git": "Git",
+      "branch": "branch:",
+      "error": "Error",
+      "start": "Start",
+      "stop": "Stop",
+      "regenerateCredentials": "Regenerate credentials",
+      "delete": "Delete",
+      "basicAuth": "Authentication (Basic Auth)",
+      "credentialsHint": "Credentials are only shown at creation or after regeneration.",
+      "assignUsers": "Assign users",
+      "saveAssignments": "Save assignments",
+      "platformLog": "Platform log",
+      "noEvents": "No events.",
+      "dockerLogs": "Docker logs (last 100 lines)"
+    }
+  },
+  "images": {
+    "title": "Docker images",
+    "new": "New template",
+    "registryHint": "Local registry: images available for your dev environments.",
+    "columns": {
+      "name": "Name",
+      "dockerImage": "Docker image",
+      "build": "Build",
+      "default": "Default"
+    },
+    "buildStatus": {
+      "idle": "Not built",
+      "building": "Building",
+      "success": "Ready",
+      "error": "Error"
+    },
+    "create": {
+      "title": "New image template",
+      "dockerfile": "Dockerfile",
+      "isDefault": "Default template",
+      "submit": "Create template"
+    },
+    "edit": {
+      "title": "Edit {name}"
+    },
+    "show": {
+      "buildStatus": "Build status",
+      "lastBuild": "Last build",
+      "autoRefresh": " — auto-refreshing…",
+      "buildInProgress": "Build in progress…",
+      "triggerBuild": "Start Docker build",
+      "information": "Information",
+      "isDefault": "Default template",
+      "isBuiltin": "Built-in",
+      "buildLog": "Build log",
+      "dockerfile": "Dockerfile",
+      "delete": "Delete template"
+    }
+  },
+  "users": {
+    "title": "Users",
+    "new": "New user",
+    "columns": {
+      "email": "Email",
+      "name": "Name",
+      "role": "Role",
+      "active": "Active"
+    },
+    "create": {
+      "title": "New user",
+      "activeAccount": "Active account",
+      "roles": {
+        "user": "User",
+        "admin": "Administrator"
+      }
+    },
+    "edit": {
+      "title": "Edit {email}",
+      "newPassword": "New password (optional)",
+      "delete": "Delete user"
+    }
+  },
+  "webhooks": {
+    "title": "Webhooks",
+    "new": "New webhook",
+    "hint": "Receive HTTP notifications when environment states change.",
+    "none": "No webhooks configured.",
+    "columns": {
+      "name": "Name",
+      "url": "URL",
+      "events": "Events",
+      "active": "Active"
+    },
+    "eventCount": "{count} event(s)",
+    "create": {
+      "title": "New webhook",
+      "destinationUrl": "Destination URL",
+      "secret": "Secret (optional — auto-generated if empty)",
+      "eventsLegend": "Events to listen for",
+      "active": "Active webhook"
+    },
+    "edit": {
+      "title": "Edit {name}",
+      "newSecret": "New secret (leave blank to keep)",
+      "eventsLegend": "Events"
+    },
+    "show": {
+      "configuration": "Configuration",
+      "secret": "Secret (HMAC SHA-256)",
+      "events": "Events",
+      "active": "Active",
+      "signatureHint": "Signature sent in header",
+      "deliveries": "Recent deliveries",
+      "noDeliveries": "No deliveries yet.",
+      "columns": {
+        "date": "Date",
+        "event": "Event",
+        "httpStatus": "HTTP status",
+        "success": "Success"
+      },
+      "delete": "Delete webhook"
+    },
+    "events": {
+      "environment.created": "Environment created",
+      "environment.started": "Environment started",
+      "environment.stopped": "Environment stopped",
+      "environment.error": "Environment error",
+      "environment.updated": "Environment updated",
+      "environment.deleted": "Environment deleted"
+    }
+  },
+  "settings": {
+    "title": "Platform settings",
+    "envHint": "Configuration read from environment variables. Edit the .env file and restart the platform to apply changes.",
+    "domain": "Domain",
+    "adminUrl": "Admin URL",
+    "dockerNetwork": "Docker network",
+    "localRegistry": "Local registry",
+    "workspacePath": "Workspace path",
+    "defaultCpu": "Default CPU",
+    "defaultRam": "Default RAM",
+    "database": "Database",
+    "publicSignup": "Public sign-up",
+    "enabled": "Enabled",
+    "disabled": "Disabled",
+    "maintenance": "Maintenance",
+    "cronHint": "Recommended cron command to sync Docker statuses:",
+    "cores": "core(s)"
+  },
+  "errors": {
+    "not_found": "Page not found",
+    "server_error": "Something went wrong",
+    "admin_only": "Access restricted to administrators.",
+    "env_access_denied": "Access denied to this environment."
+  },
+  "status": {
+    "creating": "Creating",
+    "running": "Running",
+    "stopped": "Stopped",
+    "stopping": "Stopping",
+    "error": "Error",
+    "deleting": "Deleting",
+    "building": "Building",
+    "idle": "Idle",
+    "success": "Success",
+    "failed": "Failed"
+  },
+  "seeder": {
+    "base": {
+      "name": "Base",
+      "description": "OpenVSCode Server with basic tools"
+    },
+    "node": {
+      "name": "Node.js",
+      "description": "Node.js 24, pnpm, ESLint, Prettier"
+    },
+    "python": {
+      "name": "Python",
+      "description": "Python 3, Ruff, Python extension"
+    },
+    "php": {
+      "name": "PHP",
+      "description": "PHP 8, Composer, Intelephense"
+    }
+  }
+}

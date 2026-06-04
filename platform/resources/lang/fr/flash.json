@@ -1,0 +1,45 @@
+{
+  "setup": {
+    "admin_only": "Seul un administrateur peut finaliser la configuration.",
+    "deploy_failed": "Échec du déploiement : {message}"
+  },
+  "environments": {
+    "created": "Environnement « {name} » créé.",
+    "create_failed": "Impossible de créer l'environnement.",
+    "permission_denied": "Permission refusée.",
+    "updated": "Environnement mis à jour.",
+    "update_failed": "Échec de la mise à jour.",
+    "assignments_updated": "Utilisateurs assignés mis à jour.",
+    "started": "Environnement démarré.",
+    "start_failed": "Échec du démarrage.",
+    "stopped": "Environnement arrêté.",
+    "stop_failed": "Échec de l'arrêt.",
+    "deleted": "Environnement supprimé.",
+    "delete_failed": "Échec de la suppression.",
+    "credentials_regenerated": "Identifiants régénérés.",
+    "regenerate_failed": "Échec de la régénération."
+  },
+  "account": {
+    "setup_required": "Terminez la configuration initiale avant de créer un compte.",
+    "signup_disabled": "L'inscription publique est désactivée."
+  },
+  "webhooks": {
+    "created": "Webhook créé.",
+    "updated": "Webhook mis à jour.",
+    "deleted": "Webhook supprimé."
+  },
+  "images": {
+    "created": "Template « {name} » créé. Lancez un build pour l'utiliser.",
+    "updated": "Template mis à jour.",
+    "build_in_progress": "Un build est déjà en cours.",
+    "build_started": "Build « {name} » lancé en arrière-plan.",
+    "builtin_delete_denied": "Les templates intégrés ne peuvent pas être supprimés.",
+    "deleted": "Template supprimé."
+  },
+  "users": {
+    "created": "Utilisateur créé.",
+    "updated": "Utilisateur mis à jour.",
+    "cannot_delete_self": "Vous ne pouvez pas supprimer votre propre compte.",
+    "deleted": "Utilisateur supprimé."
+  }
+}

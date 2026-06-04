@@ -1,0 +1,45 @@
+{
+  "setup": {
+    "admin_only": "Apenas um administrador pode concluir a configuração.",
+    "deploy_failed": "Falha na implantação: {message}"
+  },
+  "environments": {
+    "created": "Ambiente «{name}» criado.",
+    "create_failed": "Não foi possível criar o ambiente.",
+    "permission_denied": "Permissão negada.",
+    "updated": "Ambiente atualizado.",
+    "update_failed": "Falha na atualização.",
+    "assignments_updated": "Usuários atribuídos atualizados.",
+    "started": "Ambiente iniciado.",
+    "start_failed": "Falha ao iniciar.",
+    "stopped": "Ambiente parado.",
+    "stop_failed": "Falha ao parar.",
+    "deleted": "Ambiente excluído.",
+    "delete_failed": "Falha ao excluir.",
+    "credentials_regenerated": "Credenciais regeneradas.",
+    "regenerate_failed": "Falha na regeneração."
+  },
+  "account": {
+    "setup_required": "Conclua a configuração inicial antes de criar uma conta.",
+    "signup_disabled": "O cadastro público está desativado."
+  },
+  "webhooks": {
+    "created": "Webhook criado.",
+    "updated": "Webhook atualizado.",
+    "deleted": "Webhook excluído."
+  },
+  "images": {
+    "created": "Modelo «{name}» criado. Inicie um build para usá-lo.",
+    "updated": "Modelo atualizado.",
+    "build_in_progress": "Já há um build em andamento.",
+    "build_started": "Build «{name}» iniciado em segundo plano.",
+    "builtin_delete_denied": "Modelos integrados não podem ser excluídos.",
+    "deleted": "Modelo excluído."
+  },
+  "users": {
+    "created": "Usuário criado.",
+    "updated": "Usuário atualizado.",
+    "cannot_delete_self": "Você não pode excluir sua própria conta.",
+    "deleted": "Usuário excluído."
+  }
+}
