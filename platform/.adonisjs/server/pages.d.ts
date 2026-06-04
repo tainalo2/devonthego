@@ -27,6 +27,8 @@ declare module '@adonisjs/inertia/types' {
     'images/index': ExtractProps<(typeof import('../../inertia/pages/images/index.tsx'))['default']>
     'images/show': ExtractProps<(typeof import('../../inertia/pages/images/show.tsx'))['default']>
     'settings/index': ExtractProps<(typeof import('../../inertia/pages/settings/index.tsx'))['default']>
+    'setup/complete': ExtractProps<(typeof import('../../inertia/pages/setup/complete.tsx'))['default']>
+    'setup/index': ExtractProps<(typeof import('../../inertia/pages/setup/index.tsx'))['default']>
     'users/create': ExtractProps<(typeof import('../../inertia/pages/users/create.tsx'))['default']>
     'users/edit': ExtractProps<(typeof import('../../inertia/pages/users/edit.tsx'))['default']>
     'users/index': ExtractProps<(typeof import('../../inertia/pages/users/index.tsx'))['default']>

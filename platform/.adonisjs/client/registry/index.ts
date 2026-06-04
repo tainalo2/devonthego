@@ -36,6 +36,18 @@ const routes = {
     tokens: [{"old":"/login","type":0,"val":"login","end":""}],
     types: placeholder as Registry['session.store']['types'],
   },
+  'setup.index': {
+    methods: ["GET","HEAD"],
+    pattern: '/setup',
+    tokens: [{"old":"/setup","type":0,"val":"setup","end":""}],
+    types: placeholder as Registry['setup.index']['types'],
+  },
+  'setup.store': {
+    methods: ["POST"],
+    pattern: '/setup',
+    tokens: [{"old":"/setup","type":0,"val":"setup","end":""}],
+    types: placeholder as Registry['setup.store']['types'],
+  },
   'session.destroy': {
     methods: ["POST"],
     pattern: '/logout',

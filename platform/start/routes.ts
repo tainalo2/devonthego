@@ -6,10 +6,18 @@
 
 import { middleware } from '#start/kernel'
 import { controllers } from '#generated/controllers'
+import SetupService from '#services/setup_service'
 import router from '@adonisjs/core/services/router'
 
 router
   .get('/', async (ctx) => {
+    if (!(await SetupService.isCompleted())) {
+      if (ctx.auth.user) {
+        return ctx.response.redirect().toRoute('setup.index')
+      }
+      return ctx.response.redirect().toRoute('session.create')
+    }
+
     if (ctx.auth.user) {
       return ctx.response.redirect().toRoute('dashboard.index')
     }
@@ -25,6 +33,13 @@ router
     router.post('login', [controllers.Session, 'store'])
   })
   .use(middleware.guest())
+
+router
+  .group(() => {
+    router.get('setup', [controllers.Setup, 'index']).as('setup.index')
+    router.post('setup', [controllers.Setup, 'store']).as('setup.store')
+  })
+  .use(middleware.auth())
 
 router
   .group(() => {

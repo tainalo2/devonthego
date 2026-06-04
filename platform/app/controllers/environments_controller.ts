@@ -194,7 +194,7 @@ export default class EnvironmentsController {
         fullName: u.fullName,
         assigned: environment.assignedUsers.some((a) => a.id === u.id),
       })),
-      domain: env.get('DOMAIN'),
+      domain: env.get('DOMAIN', 'localhost'),
     })
   }
 

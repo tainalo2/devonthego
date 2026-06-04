@@ -10,6 +10,7 @@ export const controllers = {
   NewAccount: () => import('#controllers/new_account_controller'),
   Session: () => import('#controllers/session_controller'),
   Settings: () => import('#controllers/settings_controller'),
+  Setup: () => import('#controllers/setup_controller'),
   Users: () => import('#controllers/users_controller'),
   Webhooks: () => import('#controllers/webhooks_controller'),
 }

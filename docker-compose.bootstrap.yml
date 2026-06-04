@@ -1,0 +1,21 @@
+# Overlay bootstrap — accès HTTP direct par IP (port 8080), sans redirection HTTPS.
+# Utilisé uniquement lors de l'installation initiale : docker compose -f docker-compose.yml -f docker-compose.bootstrap.yml up -d
+
+services:
+  traefik:
+    command:
+      - --log.level=INFO
+      - --api.dashboard=false
+      - --providers.docker=true
+      - --providers.docker.exposedbydefault=false
+      - --providers.docker.network=devonthego
+      - --entrypoints.web.address=:80
+      - --entrypoints.websecure.address=:443
+
+  platform:
+    ports:
+      - '8080:3333'
+    volumes:
+      - ${DOTG_INSTALL_DIR:-.}:/install:rw
+    environment:
+      DOTG_INSTALL_DIR: /install

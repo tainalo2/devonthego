@@ -14,7 +14,7 @@ export default class SettingsController {
         defaultMemoryLimit: dockerConfig.defaultMemoryLimit,
         allowPublicSignup: env.get('ALLOW_PUBLIC_SIGNUP', false),
         dbConnection: env.get('DB_CONNECTION'),
-        appUrl: env.get('APP_URL'),
+        appUrl: env.get('APP_URL', 'http://localhost:8080'),
       },
     })
   }

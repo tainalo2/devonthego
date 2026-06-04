@@ -119,6 +119,21 @@ export class ImageTemplateSchema extends BaseModel {
   declare updatedAt: DateTime | null
 }
 
+export class PlatformSettingSchema extends BaseModel {
+  static $columns = ['createdAt', 'id', 'setupCompleted', 'setupCompletedAt', 'updatedAt'] as const
+  $columns = PlatformSettingSchema.$columns
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare setupCompleted: boolean
+  @column.dateTime()
+  declare setupCompletedAt: DateTime | null
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+}
+
 export class UserSchema extends BaseModel {
   static $columns = ['createdAt', 'email', 'fullName', 'id', 'isActive', 'password', 'role', 'updatedAt'] as const
   $columns = UserSchema.$columns

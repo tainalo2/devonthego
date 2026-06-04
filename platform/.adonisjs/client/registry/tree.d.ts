@@ -12,6 +12,10 @@ export interface ApiDefinition {
     store: typeof routes['session.store']
     destroy: typeof routes['session.destroy']
   }
+  setup: {
+    index: typeof routes['setup.index']
+    store: typeof routes['setup.store']
+  }
   dashboard: {
     index: typeof routes['dashboard.index']
   }

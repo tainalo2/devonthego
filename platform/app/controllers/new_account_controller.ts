@@ -1,10 +1,16 @@
 import User from '#models/user'
+import SetupService from '#services/setup_service'
 import env from '#start/env'
 import { signupValidator } from '#validators/user'
 import type { HttpContext } from '@adonisjs/core/http'
 
 export default class NewAccountController {
-  async create({ inertia, response }: HttpContext) {
+  async create({ inertia, response, session }: HttpContext) {
+    if (!(await SetupService.isCompleted())) {
+      session.flash('error', 'Terminez la configuration initiale avant de créer un compte.')
+      return response.redirect().toRoute('session.create')
+    }
+
     const allowPublicSignup = env.get('ALLOW_PUBLIC_SIGNUP', false)
     const usersCount = await User.query().count('* as total')
     const hasUsers = Number(usersCount[0]?.$extras?.total ?? 0) > 0
@@ -17,6 +23,11 @@ export default class NewAccountController {
   }
 
   async store({ request, response, auth, session }: HttpContext) {
+    if (!(await SetupService.isCompleted())) {
+      session.flash('error', 'Terminez la configuration initiale avant de créer un compte.')
+      return response.redirect().toRoute('session.create')
+    }
+
     const allowPublicSignup = env.get('ALLOW_PUBLIC_SIGNUP', false)
     const usersCount = await User.query().count('* as total')
     const hasUsers = Number(usersCount[0]?.$extras?.total ?? 0) > 0

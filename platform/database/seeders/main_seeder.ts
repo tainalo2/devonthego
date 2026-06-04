@@ -48,6 +48,24 @@ export default class extends BaseSeeder {
       await ImageTemplate.updateOrCreate({ slug: template.slug }, template)
     }
 
+    const bootstrapEmail = env.get('BOOTSTRAP_ADMIN_EMAIL')
+    const bootstrapPassword = env.get('BOOTSTRAP_ADMIN_PASSWORD')
+    const bootstrapMode = env.get('BOOTSTRAP_MODE', false)
+
+    if (bootstrapMode && bootstrapEmail && bootstrapPassword) {
+      const existing = await User.findBy('email', bootstrapEmail)
+      if (!existing) {
+        await User.create({
+          email: bootstrapEmail,
+          password: bootstrapPassword,
+          fullName: 'Bootstrap Admin',
+          role: 'admin',
+          isActive: true,
+        })
+      }
+      return
+    }
+
     const adminEmail = env.get('ADMIN_EMAIL')
     const adminPassword = env.get('ADMIN_PASSWORD')
 

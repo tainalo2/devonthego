@@ -67,6 +67,30 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/session_controller').default['store']>>>
     }
   }
+  'setup.index': {
+    methods: ["GET","HEAD"]
+    pattern: '/setup'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/setup_controller').default['index']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/setup_controller').default['index']>>>
+    }
+  }
+  'setup.store': {
+    methods: ["POST"]
+    pattern: '/setup'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/setup').setupValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/setup').setupValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/setup_controller').default['store']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/setup_controller').default['store']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
   'session.destroy': {
     methods: ["POST"]
     pattern: '/logout'

@@ -1,13 +1,23 @@
 import PublicLayout from '~/layouts/public'
 import { Form, Link } from '@adonisjs/inertia/react'
 
-export default function Login() {
+type Props = {
+  bootstrapMode?: boolean
+}
+
+export default function Login({ bootstrapMode = false }: Props) {
   return (
     <PublicLayout>
       <div className="form-container">
         <div>
           <h1>Connexion</h1>
           <p>Connectez-vous à votre espace Dev on the go.</p>
+          {bootstrapMode && (
+            <p className="muted">
+              Première installation ? Utilisez les identifiants affichés par <code>install.sh</code>,
+              puis suivez l&apos;assistant de configuration.
+            </p>
+          )}
         </div>
 
         <Form route="session.store">

@@ -20,9 +20,12 @@ export default await Env.create(new URL('../', import.meta.url), {
 
   // App
   APP_KEY: Env.schema.secret(),
-  APP_URL: Env.schema.string({ format: 'url', tld: false }),
-  DOMAIN: Env.schema.string(),
+  APP_URL: Env.schema.string.optional({ format: 'url', tld: false }),
+  DOMAIN: Env.schema.string.optional(),
   ALLOW_PUBLIC_SIGNUP: Env.schema.boolean.optional(),
+  BOOTSTRAP_MODE: Env.schema.boolean.optional(),
+  DOTG_INSTALL_DIR: Env.schema.string.optional(),
+  ACME_EMAIL: Env.schema.string.optional(),
 
   // Session
   SESSION_DRIVER: Env.schema.enum(['cookie', 'memory', 'database'] as const),
@@ -46,4 +49,6 @@ export default await Env.create(new URL('../', import.meta.url), {
   ADMIN_EMAIL: Env.schema.string.optional(),
   ADMIN_PASSWORD: Env.schema.string.optional(),
   ADMIN_FULL_NAME: Env.schema.string.optional(),
+  BOOTSTRAP_ADMIN_EMAIL: Env.schema.string.optional(),
+  BOOTSTRAP_ADMIN_PASSWORD: Env.schema.string.optional(),
 })

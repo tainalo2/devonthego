@@ -4,11 +4,16 @@ set -euo pipefail
 # Dev on the go — Bootstrap VPS
 # Usage: curl -fsSL .../install.sh | bash
 #    or: ./install.sh
-#    ou: ./install.sh --non-interactive  (conserve .env sans questions)
+#
+# Par défaut : installation zero-config (accès IP:8080 + assistant web /setup)
+#    ./install.sh --interactive     Configuration CLI complète (sans assistant web)
+#    ./install.sh --non-interactive Conserve le .env existant
 
-REPO_URL="${DOTG_REPO_URL:-https://github.com/tainalo2/dev-on-the-go.git}"
+REPO_URL="${DOTG_REPO_URL:-https://github.com/tainalo2/devonthego.git}"
 INSTALL_DIR="${DOTG_INSTALL_DIR:-/opt/devonthego}"
+INSTALL_MODE="bootstrap"
 NON_INTERACTIVE=false
+COMPOSE_FILES=(-f docker-compose.yml -f docker-compose.bootstrap.yml)
 
 log() { echo "[devonthego] $*"; }
 error() { echo "[devonthego] ERROR: $*" >&2; exit 1; }
@@ -20,17 +25,20 @@ require_root() {
 parse_args() {
   for arg in "$@"; do
     case "${arg}" in
+      --interactive) INSTALL_MODE="interactive" ;;
       --non-interactive) NON_INTERACTIVE=true ;;
       -h|--help)
         cat <<EOF
 Usage: install.sh [options]
 
 Options:
-  --non-interactive   Utilise le .env existant sans poser de questions
+  (défaut)            Installation zero-config : accès http://IP:8080 + wizard web
+  --interactive       Configuration CLI complète avant déploiement HTTPS
+  --non-interactive   Conserve le .env existant sans questions
   -h, --help          Affiche cette aide
 
 Variables d'environnement:
-  DOTG_REPO_URL       URL du dépôt Git (défaut: GitHub tainalo2/dev-on-the-go)
+  DOTG_REPO_URL       URL du dépôt Git
   DOTG_INSTALL_DIR    Répertoire d'installation (défaut: /opt/devonthego)
 EOF
         exit 0
@@ -57,6 +65,16 @@ detect_os() {
   log "OS détecté: ${OS_ID} ${OS_VERSION}"
 }
 
+detect_public_ip() {
+  local ip=""
+  ip="$(curl -4 -fsSL --max-time 5 https://api.ipify.org 2>/dev/null || true)"
+  if [[ -z "${ip}" ]]; then
+    ip="$(hostname -I 2>/dev/null | awk '{print $1}' || true)"
+  fi
+  [[ -n "${ip}" ]] || ip="127.0.0.1"
+  printf '%s' "${ip}"
+}
+
 install_docker() {
   if command -v docker >/dev/null 2>&1; then
     log "Docker déjà installé: $(docker --version)"
@@ -75,26 +93,23 @@ configure_firewall() {
     return
   fi
 
-  log "Configuration du firewall (ports 22, 80, 443)..."
+  log "Configuration du firewall (ports 22, 80, 443, 8080)..."
   ufw allow 22/tcp
   ufw allow 80/tcp
   ufw allow 443/tcp
+  ufw allow 8080/tcp
   ufw --force enable || true
 }
 
-# Lit une variable depuis un fichier KEY=VALUE (sans l'exporter)
 read_env_value() {
   local key="$1"
   local file="$2"
   local line value
 
   [[ -f "${file}" ]] || return 0
-
   line="$(grep -E "^${key}=" "${file}" 2>/dev/null | tail -1 || true)"
   [[ -n "${line}" ]] || return 0
-
   value="${line#*=}"
-  # Retire les guillemets entourants éventuels
   value="${value%\"}"
   value="${value#\"}"
   value="${value%\'}"
@@ -102,7 +117,6 @@ read_env_value() {
   printf '%s' "${value}"
 }
 
-# Échappe une valeur pour écriture dans .env (guillemets si caractères spéciaux)
 escape_env_value() {
   local value="$1"
   if [[ "${value}" =~ [[:space:]#\$\\\"\'] ]]; then
@@ -119,9 +133,10 @@ write_env_file() {
   local tmp_file
   tmp_file="$(mktemp)"
 
-  # Variables configurées interactivement (écrasent .env.example)
   local -a CONFIG_KEYS=(
-    DOMAIN ACME_EMAIL ADMIN_EMAIL ADMIN_FULL_NAME ADMIN_PASSWORD
+    BOOTSTRAP_MODE DOTG_INSTALL_DIR DOMAIN ACME_EMAIL
+    ADMIN_EMAIL ADMIN_FULL_NAME ADMIN_PASSWORD
+    BOOTSTRAP_ADMIN_EMAIL BOOTSTRAP_ADMIN_PASSWORD
     APP_KEY APP_URL ALLOW_PUBLIC_SIGNUP ENV_CPU_LIMIT ENV_MEMORY_LIMIT
   )
 
@@ -148,6 +163,52 @@ write_env_file() {
   chmod 600 "${env_file}"
 }
 
+generate_bootstrap_env() {
+  if [[ -f "${INSTALL_DIR}/.env" && "${NON_INTERACTIVE}" == "true" ]]; then
+    log "Mode non-interactif : .env conservé tel quel."
+    return
+  fi
+
+  if [[ -f "${INSTALL_DIR}/.env" ]]; then
+    local completed
+    completed="$(read_env_value BOOTSTRAP_MODE "${INSTALL_DIR}/.env")"
+    if [[ "${completed}" == "false" ]]; then
+      log "Configuration production déjà présente — .env conservé."
+      COMPOSE_FILES=(-f docker-compose.yml)
+      INSTALL_MODE="production"
+      return
+    fi
+  fi
+
+  local server_ip app_key bootstrap_password
+  server_ip="$(detect_public_ip)"
+  app_key="$(openssl rand -base64 32)"
+  bootstrap_password="$(openssl rand -base64 12)"
+
+  # shellcheck disable=SC2034
+  BOOTSTRAP_MODE=true
+  DOTG_INSTALL_DIR="${INSTALL_DIR}"
+  DOMAIN=bootstrap.local
+  ACME_EMAIL=bootstrap@local.invalid
+  ADMIN_EMAIL=
+  ADMIN_PASSWORD=
+  ADMIN_FULL_NAME=
+  BOOTSTRAP_ADMIN_EMAIL=admin@bootstrap.local
+  BOOTSTRAP_ADMIN_PASSWORD="${bootstrap_password}"
+  APP_KEY="${app_key}"
+  APP_URL="http://${server_ip}:8080"
+  ALLOW_PUBLIC_SIGNUP=false
+  ENV_CPU_LIMIT=1
+  ENV_MEMORY_LIMIT=1024m
+
+  write_env_file
+  chmod +x "${INSTALL_DIR}/scripts/finish-setup.sh" 2>/dev/null || true
+
+  log "Configuration bootstrap générée (${INSTALL_DIR}/.env)"
+  export BOOTSTRAP_SUMMARY_IP="${server_ip}"
+  export BOOTSTRAP_SUMMARY_PASSWORD="${bootstrap_password}"
+}
+
 confirm_or_prompt() {
   local var_name="$1"
   local label="$2"
@@ -165,38 +226,31 @@ confirm_or_prompt() {
 
   echo ""
   echo "── ${label} (${var_name}) ──"
-
   if [[ -n "${current}" ]]; then
     if [[ "${is_secret}" == "true" ]]; then
-      echo "Valeur actuelle : ******** (masquée)"
+      echo "Valeur actuelle : ********"
     else
       echo "Valeur actuelle : ${current}"
     fi
-
     local confirm
     read -rp "Conserver cette valeur ? [O/n] " confirm
     if [[ ! "${confirm}" =~ ^[Nn]$ ]]; then
       printf -v "${var_name}" '%s' "${current}"
       return
     fi
-  else
-    echo "Aucune valeur définie."
   fi
 
   local new_value
   if [[ "${is_secret}" == "true" ]]; then
-    read -rsp "Nouvelle valeur (Entrée = laisser vide) : " new_value
+    read -rsp "Nouvelle valeur : " new_value
     echo
   else
     read -rp "Nouvelle valeur : " new_value
   fi
 
-  if [[ -z "${new_value}" && "${allow_empty}" != "true" ]]; then
+  while [[ -z "${new_value}" && "${allow_empty}" != "true" ]]; do
     read -rp "La valeur ne peut pas être vide. Nouvelle valeur : " new_value
-    while [[ -z "${new_value}" ]]; do
-      read -rp "La valeur ne peut pas être vide. Nouvelle valeur : " new_value
-    done
-  fi
+  done
 
   printf -v "${var_name}" '%s' "${new_value}"
 }
@@ -214,7 +268,6 @@ confirm_or_prompt_bool() {
   echo ""
   echo "── ${label} (${var_name}) ──"
   echo "Valeur actuelle : ${current}"
-
   local confirm
   read -rp "Conserver cette valeur ? [O/n] " confirm
   if [[ ! "${confirm}" =~ ^[Nn]$ ]]; then
@@ -224,7 +277,7 @@ confirm_or_prompt_bool() {
 
   local answer
   while true; do
-    read -rp "Activer ? [o/N] (true/false) : " answer
+    read -rp "Activer ? [o/N] : " answer
     case "${answer,,}" in
       true|t|o|oui|y|yes|1) printf -v "${var_name}" '%s' "true"; return ;;
       false|f|n|non|''|0) printf -v "${var_name}" '%s' "false"; return ;;
@@ -233,117 +286,76 @@ confirm_or_prompt_bool() {
   done
 }
 
-prompt_env() {
+prompt_env_interactive() {
   local source_file="${INSTALL_DIR}/.env.example"
   if [[ -f "${INSTALL_DIR}/.env" ]]; then
     source_file="${INSTALL_DIR}/.env"
-    log "Configuration existante détectée : ${INSTALL_DIR}/.env"
-  else
-    log "Aucun .env trouvé — utilisation de .env.example comme base."
   fi
 
   if [[ "${NON_INTERACTIVE}" == "true" && -f "${INSTALL_DIR}/.env" ]]; then
-    log "Mode non-interactif : .env conservé tel quel."
+    COMPOSE_FILES=(-f docker-compose.yml)
     return
   fi
 
   echo ""
   echo "╔══════════════════════════════════════════════════════════════╗"
-  echo "║        Configuration Dev on the go                           ║"
-  echo "╠══════════════════════════════════════════════════════════════╣"
-  echo "║  Pour chaque variable : confirmez [O] ou saisissez [n]       ║"
+  echo "║     Configuration Dev on the go (mode interactif CLI)         ║"
   echo "╚══════════════════════════════════════════════════════════════╝"
 
   # shellcheck disable=SC2034
+  BOOTSTRAP_MODE=false
+  DOTG_INSTALL_DIR="${INSTALL_DIR}"
   DOMAIN="$(read_env_value DOMAIN "${source_file}")"
-  # shellcheck disable=SC2034
   ACME_EMAIL="$(read_env_value ACME_EMAIL "${source_file}")"
-  # shellcheck disable=SC2034
   ADMIN_EMAIL="$(read_env_value ADMIN_EMAIL "${source_file}")"
-  # shellcheck disable=SC2034
   ADMIN_FULL_NAME="$(read_env_value ADMIN_FULL_NAME "${source_file}")"
-  # shellcheck disable=SC2034
   ADMIN_PASSWORD="$(read_env_value ADMIN_PASSWORD "${source_file}")"
-  # shellcheck disable=SC2034
   APP_KEY="$(read_env_value APP_KEY "${source_file}")"
-  # shellcheck disable=SC2034
   APP_URL="$(read_env_value APP_URL "${source_file}")"
-  # shellcheck disable=SC2034
   ALLOW_PUBLIC_SIGNUP="$(read_env_value ALLOW_PUBLIC_SIGNUP "${source_file}")"
-  # shellcheck disable=SC2034
   ENV_CPU_LIMIT="$(read_env_value ENV_CPU_LIMIT "${source_file}")"
-  # shellcheck disable=SC2034
   ENV_MEMORY_LIMIT="$(read_env_value ENV_MEMORY_LIMIT "${source_file}")"
+  BOOTSTRAP_ADMIN_EMAIL=
+  BOOTSTRAP_ADMIN_PASSWORD=
 
-  # Valeurs par défaut si absentes
   ADMIN_FULL_NAME="${ADMIN_FULL_NAME:-Administrator}"
   ALLOW_PUBLIC_SIGNUP="${ALLOW_PUBLIC_SIGNUP:-false}"
   ENV_CPU_LIMIT="${ENV_CPU_LIMIT:-1}"
   ENV_MEMORY_LIMIT="${ENV_MEMORY_LIMIT:-1024m}"
 
-  confirm_or_prompt DOMAIN "Domaine principal (ex: dev.example.com)" "${DOMAIN}"
-  confirm_or_prompt ACME_EMAIL "Email Let's Encrypt (certificats TLS)" "${ACME_EMAIL}"
-  confirm_or_prompt ADMIN_EMAIL "Email administrateur plateforme" "${ADMIN_EMAIL}"
-  confirm_or_prompt ADMIN_FULL_NAME "Nom complet de l'administrateur" "${ADMIN_FULL_NAME}" false true
-
-  confirm_or_prompt ADMIN_PASSWORD "Mot de passe administrateur" "${ADMIN_PASSWORD}" true true
+  confirm_or_prompt DOMAIN "Domaine principal" "${DOMAIN}"
+  confirm_or_prompt ACME_EMAIL "Email Let's Encrypt" "${ACME_EMAIL}"
+  confirm_or_prompt ADMIN_EMAIL "Email administrateur" "${ADMIN_EMAIL}"
+  confirm_or_prompt ADMIN_FULL_NAME "Nom administrateur" "${ADMIN_FULL_NAME}" false true
+  confirm_or_prompt ADMIN_PASSWORD "Mot de passe admin" "${ADMIN_PASSWORD}" true true
   if [[ -z "${ADMIN_PASSWORD}" ]]; then
     ADMIN_PASSWORD="$(openssl rand -base64 16)"
-    log "Mot de passe admin généré automatiquement."
   fi
 
-  # APP_URL dérivé du domaine par défaut
   local default_app_url="https://admin.${DOMAIN}"
-  if [[ -z "${APP_URL}" || "${APP_URL}" == *"example.com"* || "${APP_URL}" == *"\${HOST}"* ]]; then
+  if [[ -z "${APP_URL}" || "${APP_URL}" == *"example.com"* ]]; then
     APP_URL="${default_app_url}"
   fi
-
-  confirm_or_prompt APP_URL "URL de l'interface admin" "${APP_URL}"
-
-  confirm_or_prompt_bool ALLOW_PUBLIC_SIGNUP "Inscription publique autorisée" "${ALLOW_PUBLIC_SIGNUP}"
-  confirm_or_prompt ENV_CPU_LIMIT "Limite CPU par environnement (cores)" "${ENV_CPU_LIMIT}"
-  confirm_or_prompt ENV_MEMORY_LIMIT "Limite RAM par environnement (ex: 1024m)" "${ENV_MEMORY_LIMIT}"
+  confirm_or_prompt APP_URL "URL interface admin" "${APP_URL}"
+  confirm_or_prompt_bool ALLOW_PUBLIC_SIGNUP "Inscription publique" "${ALLOW_PUBLIC_SIGNUP}"
+  confirm_or_prompt ENV_CPU_LIMIT "CPU par environnement" "${ENV_CPU_LIMIT}"
+  confirm_or_prompt ENV_MEMORY_LIMIT "RAM par environnement" "${ENV_MEMORY_LIMIT}"
 
   if [[ -z "${APP_KEY}" ]]; then
     APP_KEY="$(openssl rand -base64 32)"
-    log "APP_KEY générée automatiquement."
-  else
-    echo ""
-    echo "── Clé de chiffrement application (APP_KEY) ──"
-    echo "Valeur actuelle : ******** (masquée)"
-    local regen_key
-    read -rp "Regénérer APP_KEY ? [o/N] " regen_key
-    if [[ "${regen_key}" =~ ^[OoYy]$ ]]; then
-      APP_KEY="$(openssl rand -base64 32)"
-      log "APP_KEY regénérée."
-    fi
-  fi
-
-  echo ""
-  echo "── Récapitulatif ──"
-  echo "  DOMAIN              = ${DOMAIN}"
-  echo "  ACME_EMAIL          = ${ACME_EMAIL}"
-  echo "  ADMIN_EMAIL         = ${ADMIN_EMAIL}"
-  echo "  ADMIN_FULL_NAME     = ${ADMIN_FULL_NAME}"
-  echo "  ADMIN_PASSWORD      = ********"
-  echo "  APP_URL             = ${APP_URL}"
-  echo "  ALLOW_PUBLIC_SIGNUP = ${ALLOW_PUBLIC_SIGNUP}"
-  echo "  ENV_CPU_LIMIT       = ${ENV_CPU_LIMIT}"
-  echo "  ENV_MEMORY_LIMIT    = ${ENV_MEMORY_LIMIT}"
-  echo ""
-
-  if [[ "${NON_INTERACTIVE}" != "true" ]]; then
-    local final_confirm
-    read -rp "Enregistrer cette configuration dans .env ? [O/n] " final_confirm
-    if [[ "${final_confirm}" =~ ^[Nn]$ ]]; then
-      error "Installation annulée par l'utilisateur."
-    fi
   fi
 
   write_env_file
-
+  COMPOSE_FILES=(-f docker-compose.yml)
   log "Configuration sauvegardée dans ${INSTALL_DIR}/.env"
-  log "Identifiants admin — email: ${ADMIN_EMAIL} / mot de passe: ${ADMIN_PASSWORD}"
+}
+
+configure_env() {
+  if [[ "${INSTALL_MODE}" == "interactive" ]]; then
+    prompt_env_interactive
+  else
+    generate_bootstrap_env
+  fi
 }
 
 clone_or_update() {
@@ -369,17 +381,40 @@ build_images() {
 start_stack() {
   log "Démarrage de la stack..."
   cd "${INSTALL_DIR}"
-  docker compose pull
-  docker compose build platform
-  docker compose up -d
+  export DOTG_INSTALL_DIR="${INSTALL_DIR}"
+  docker compose "${COMPOSE_FILES[@]}" pull
+  docker compose "${COMPOSE_FILES[@]}" build platform
+  docker compose "${COMPOSE_FILES[@]}" up -d
 
   log "Attente du démarrage de la plateforme..."
-  sleep 10
-  docker compose exec -T platform node ace migration:run --force || true
-  docker compose exec -T platform node ace db:seed || true
+  sleep 15
 }
 
-print_summary() {
+print_summary_bootstrap() {
+  local ip="${BOOTSTRAP_SUMMARY_IP:-$(detect_public_ip)}"
+  local password="${BOOTSTRAP_SUMMARY_PASSWORD:-}"
+
+  if [[ -z "${password}" && -f "${INSTALL_DIR}/.env" ]]; then
+    password="$(read_env_value BOOTSTRAP_ADMIN_PASSWORD "${INSTALL_DIR}/.env")"
+  fi
+
+  cat <<EOF
+
+╔══════════════════════════════════════════════════════════════╗
+║        Dev on the go — Installation bootstrap terminée       ║
+╠══════════════════════════════════════════════════════════════╣
+║  1. Ouvrez :  http://${ip}:8080
+║  2. Connectez-vous avec :
+║       Email      admin@bootstrap.local
+║       Mot de passe  ${password}
+║  3. Suivez l'assistant de configuration (/setup)
+╠══════════════════════════════════════════════════════════════╣
+║  Après configuration : https://admin.<votre-domaine>
+╚══════════════════════════════════════════════════════════════╝
+EOF
+}
+
+print_summary_production() {
   # shellcheck source=/dev/null
   source "${INSTALL_DIR}/.env"
   cat <<EOF
@@ -390,13 +425,16 @@ print_summary() {
 ║  Admin:     ${APP_URL}
 ║  Email:     ${ADMIN_EMAIL}
 ║  Password:  ${ADMIN_PASSWORD}
-╠══════════════════════════════════════════════════════════════╣
-║  Commandes utiles:
-║    cd ${INSTALL_DIR}
-║    docker compose logs -f platform
-║    docker compose restart
 ╚══════════════════════════════════════════════════════════════╝
 EOF
+}
+
+print_summary() {
+  if [[ "${INSTALL_MODE}" == "bootstrap" ]]; then
+    print_summary_bootstrap
+  else
+    print_summary_production
+  fi
 }
 
 main() {
@@ -406,7 +444,7 @@ main() {
   install_docker
   configure_firewall
   clone_or_update
-  prompt_env
+  configure_env
   build_images
   start_stack
   print_summary
