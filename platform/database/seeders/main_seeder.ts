@@ -13,6 +13,7 @@ export default class extends BaseSeeder {
         description: 'OpenVSCode Server avec outils de base',
         isDefault: true,
         isBuiltin: true,
+        buildStatus: 'idle' as const,
       },
       {
         name: 'Node.js',
@@ -21,6 +22,7 @@ export default class extends BaseSeeder {
         description: 'Node.js 24, pnpm, ESLint, Prettier',
         isDefault: false,
         isBuiltin: true,
+        buildStatus: 'idle' as const,
       },
       {
         name: 'Python',
@@ -29,6 +31,7 @@ export default class extends BaseSeeder {
         description: 'Python 3, Ruff, extension Python',
         isDefault: false,
         isBuiltin: true,
+        buildStatus: 'idle' as const,
       },
       {
         name: 'PHP',
@@ -37,6 +40,7 @@ export default class extends BaseSeeder {
         description: 'PHP 8, Composer, Intelephense',
         isDefault: false,
         isBuiltin: true,
+        buildStatus: 'idle' as const,
       },
     ]
 

@@ -18,6 +18,7 @@ export type ScannedRoutes = {
     'environments.start': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'environments.stop': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'environments.regenerateCredentials': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'environments.assignUsers': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'environments.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'users.index': { paramsTuple?: []; params?: {} }
     'users.create': { paramsTuple?: []; params?: {} }
@@ -26,6 +27,14 @@ export type ScannedRoutes = {
     'users.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'users.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'images.index': { paramsTuple?: []; params?: {} }
+    'images.create': { paramsTuple?: []; params?: {} }
+    'images.store': { paramsTuple?: []; params?: {} }
+    'images.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'images.edit': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'images.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'images.build': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'images.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'settings.index': { paramsTuple?: []; params?: {} }
   }
   GET: {
     'home': { paramsTuple?: []; params?: {} }
@@ -39,6 +48,10 @@ export type ScannedRoutes = {
     'users.create': { paramsTuple?: []; params?: {} }
     'users.edit': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'images.index': { paramsTuple?: []; params?: {} }
+    'images.create': { paramsTuple?: []; params?: {} }
+    'images.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'images.edit': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'settings.index': { paramsTuple?: []; params?: {} }
   }
   HEAD: {
     'home': { paramsTuple?: []; params?: {} }
@@ -52,6 +65,10 @@ export type ScannedRoutes = {
     'users.create': { paramsTuple?: []; params?: {} }
     'users.edit': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'images.index': { paramsTuple?: []; params?: {} }
+    'images.create': { paramsTuple?: []; params?: {} }
+    'images.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'images.edit': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'settings.index': { paramsTuple?: []; params?: {} }
   }
   POST: {
     'new_account.store': { paramsTuple?: []; params?: {} }
@@ -61,14 +78,19 @@ export type ScannedRoutes = {
     'environments.start': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'environments.stop': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'environments.regenerateCredentials': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'environments.assignUsers': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'users.store': { paramsTuple?: []; params?: {} }
+    'images.store': { paramsTuple?: []; params?: {} }
+    'images.build': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   DELETE: {
     'environments.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'users.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'images.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   PUT: {
     'users.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'images.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
 }
 declare module '@adonisjs/core/types/http' {

@@ -494,3 +494,60 @@ code {
 .checkbox input {
   width: auto;
 }
+
+.checkbox-group {
+  border: 1px solid var(--gray-3);
+  border-radius: 6px;
+  padding: 16px;
+  display: grid;
+  gap: 8px;
+}
+
+.checkbox-group legend {
+  font-weight: 600;
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+
+textarea {
+  width: 100%;
+  border: 1px solid var(--gray-4);
+  border-radius: 4px;
+  padding: 12px;
+  font: inherit;
+  font-family: ui-monospace, monospace;
+  font-size: 13px;
+}
+
+.docker-logs {
+  background: var(--gray-12);
+  color: var(--gray-2);
+  padding: 16px;
+  border-radius: 6px;
+  overflow-x: auto;
+  font-size: 12px;
+  line-height: 1.5;
+  max-height: 400px;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.settings-list {
+  margin-top: 16px;
+}
+
+.small {
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+.badge-idle {
+  background: var(--gray-2);
+  color: var(--gray-8);
+}
+
+.badge-building {
+  background: #fef3c7;
+  color: #92400e;
+}

@@ -21,7 +21,11 @@ declare module '@adonisjs/inertia/types' {
     'errors/not_found': ExtractProps<(typeof import('../../inertia/pages/errors/not_found.tsx'))['default']>
     'errors/server_error': ExtractProps<(typeof import('../../inertia/pages/errors/server_error.tsx'))['default']>
     'home': ExtractProps<(typeof import('../../inertia/pages/home.tsx'))['default']>
+    'images/create': ExtractProps<(typeof import('../../inertia/pages/images/create.tsx'))['default']>
+    'images/edit': ExtractProps<(typeof import('../../inertia/pages/images/edit.tsx'))['default']>
     'images/index': ExtractProps<(typeof import('../../inertia/pages/images/index.tsx'))['default']>
+    'images/show': ExtractProps<(typeof import('../../inertia/pages/images/show.tsx'))['default']>
+    'settings/index': ExtractProps<(typeof import('../../inertia/pages/settings/index.tsx'))['default']>
     'users/create': ExtractProps<(typeof import('../../inertia/pages/users/create.tsx'))['default']>
     'users/edit': ExtractProps<(typeof import('../../inertia/pages/users/edit.tsx'))['default']>
     'users/index': ExtractProps<(typeof import('../../inertia/pages/users/index.tsx'))['default']>

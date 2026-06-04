@@ -81,14 +81,20 @@ export class EnvironmentSchema extends BaseModel {
 }
 
 export class ImageTemplateSchema extends BaseModel {
-  static $columns = ['createdAt', 'description', 'dockerImage', 'extensions', 'id', 'isBuiltin', 'isDefault', 'name', 'slug', 'updatedAt'] as const
+  static $columns = ['buildError', 'buildStatus', 'createdAt', 'description', 'dockerImage', 'dockerfile', 'extensions', 'id', 'isBuiltin', 'isDefault', 'lastBuiltAt', 'name', 'slug', 'updatedAt'] as const
   $columns = ImageTemplateSchema.$columns
+  @column()
+  declare buildError: string | null
+  @column()
+  declare buildStatus: string
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
   @column()
   declare description: string | null
   @column()
   declare dockerImage: string
+  @column()
+  declare dockerfile: string | null
   @column()
   declare extensions: any | null
   @column({ isPrimary: true })
@@ -97,6 +103,8 @@ export class ImageTemplateSchema extends BaseModel {
   declare isBuiltin: boolean
   @column()
   declare isDefault: boolean
+  @column.dateTime()
+  declare lastBuiltAt: DateTime | null
   @column()
   declare name: string
   @column()

@@ -10,3 +10,16 @@ export const createEnvironmentValidator = vine.compile(
     assignedUserIds: vine.array(vine.number()).optional(),
   })
 )
+
+export const assignEnvironmentUsersValidator = vine.compile(
+  vine.object({
+    assignedUserIds: vine.array(vine.number()).optional(),
+  })
+)
+
+export const updateEnvironmentValidator = vine.compile(
+  vine.object({
+    name: vine.string().trim().minLength(2).maxLength(80).optional(),
+    assignedUserIds: vine.array(vine.number()).optional(),
+  })
+)

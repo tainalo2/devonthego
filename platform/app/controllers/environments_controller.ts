@@ -3,7 +3,7 @@ import User from '#models/user'
 import ImageTemplate from '#models/image_template'
 import EnvironmentService from '#services/environment_service'
 import dockerConfig from '#config/docker'
-import { createEnvironmentValidator } from '#validators/environment'
+import { assignEnvironmentUsersValidator, createEnvironmentValidator } from '#validators/environment'
 import type { HttpContext } from '@adonisjs/core/http'
 
 export default class EnvironmentsController {
@@ -59,6 +59,7 @@ export default class EnvironmentsController {
         dockerImage: t.dockerImage,
         description: t.description,
         isDefault: t.isDefault,
+        buildStatus: t.buildStatus,
       })),
       users: users.map((u) => ({ id: u.id, email: u.email, fullName: u.fullName, role: u.role })),
       defaults: {
@@ -121,6 +122,13 @@ export default class EnvironmentsController {
     await service.syncStatus(environment)
     await environment.refresh()
 
+    const canManage =
+      user.isAdmin || environment.ownerId === user.id
+
+    const allUsers = canManage
+      ? await User.query().where('is_active', true).whereNot('id', environment.ownerId).orderBy('email')
+      : []
+
     const logs = await EnvironmentLog.query()
       .where('environment_id', environment.id)
       .orderBy('created_at', 'desc')
@@ -137,6 +145,8 @@ export default class EnvironmentsController {
         password: service.getDecryptedPassword(environment),
       }
     }
+
+    const dockerLogs = await service.getDockerLogs(environment)
 
     return inertia.render('environments/show', {
       environment: {
@@ -172,8 +182,35 @@ export default class EnvironmentsController {
         message: log.message,
         createdAt: log.createdAt.toISO() ?? '',
       })),
+      dockerLogs,
+      canManage,
+      availableUsers: allUsers.map((u) => ({
+        id: u.id,
+        email: u.email,
+        fullName: u.fullName,
+        assigned: environment.assignedUsers.some((a) => a.id === u.id),
+      })),
       domain: env.get('DOMAIN'),
     })
+  }
+
+  async assignUsers({ request, response, params, session, auth }: HttpContext) {
+    const user = auth.user!
+    const Environment = (await import('#models/environment')).default
+    const service = new EnvironmentService()
+    const environment = await Environment.findOrFail(params.id)
+
+    if (!user.isAdmin && environment.ownerId !== user.id) {
+      session.flash('error', 'Permission refusée.')
+      return response.redirect().toRoute('environments.show', { id: environment.id })
+    }
+
+    const payload = await request.validateUsing(assignEnvironmentUsersValidator)
+
+    await service.assignUsers(environment, payload.assignedUserIds ?? [])
+    session.flash('success', 'Utilisateurs assignés mis à jour.')
+
+    return response.redirect().toRoute('environments.show', { id: environment.id })
   }
 
   async start({ params, response, session }: HttpContext) {

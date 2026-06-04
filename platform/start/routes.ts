@@ -54,6 +54,10 @@ router
       .use(middleware.canManageEnvironment())
       .as('environments.regenerateCredentials')
     router
+      .post('environments/:id/assign-users', [controllers.Environments, 'assignUsers'])
+      .use(middleware.canManageEnvironment())
+      .as('environments.assignUsers')
+    router
       .delete('environments/:id', [controllers.Environments, 'destroy'])
       .use(middleware.canManageEnvironment())
       .as('environments.destroy')
@@ -68,6 +72,15 @@ router
         router.delete('users/:id', [controllers.Users, 'destroy']).as('users.destroy')
 
         router.get('images', [controllers.ImageTemplates, 'index']).as('images.index')
+        router.get('images/create', [controllers.ImageTemplates, 'create']).as('images.create')
+        router.post('images', [controllers.ImageTemplates, 'store']).as('images.store')
+        router.get('images/:id', [controllers.ImageTemplates, 'show']).as('images.show')
+        router.get('images/:id/edit', [controllers.ImageTemplates, 'edit']).as('images.edit')
+        router.put('images/:id', [controllers.ImageTemplates, 'update']).as('images.update')
+        router.post('images/:id/build', [controllers.ImageTemplates, 'build']).as('images.build')
+        router.delete('images/:id', [controllers.ImageTemplates, 'destroy']).as('images.destroy')
+
+        router.get('settings', [controllers.Settings, 'index']).as('settings.index')
       })
       .use(middleware.admin())
   })

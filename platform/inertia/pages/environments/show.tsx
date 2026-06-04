@@ -25,14 +25,31 @@ type Log = {
   createdAt: string
 }
 
+type AvailableUser = {
+  id: number
+  email: string
+  fullName: string | null
+  assigned: boolean
+}
+
 type Props = {
   environment: Environment
   credentials: { username: string; password: string } | null
   logs: Log[]
+  dockerLogs: string | null
+  canManage: boolean
+  availableUsers: AvailableUser[]
   domain: string
 }
 
-export default function EnvironmentShow({ environment, credentials, logs }: Props) {
+export default function EnvironmentShow({
+  environment,
+  credentials,
+  logs,
+  dockerLogs,
+  canManage,
+  availableUsers,
+}: Props) {
   return (
     <AppLayout>
       <div className="page">
@@ -64,11 +81,23 @@ export default function EnvironmentShow({ environment, credentials, logs }: Prop
               </div>
               <div>
                 <dt>Image Docker</dt>
-                <dd>{environment.dockerImage}</dd>
+                <dd>
+                  <code>{environment.dockerImage}</code>
+                </dd>
               </div>
               <div>
                 <dt>Propriétaire</dt>
                 <dd>{environment.owner.email}</dd>
+              </div>
+              <div>
+                <dt>Utilisateurs assignés</dt>
+                <dd>
+                  {environment.assignedUsers.length === 0 ? (
+                    <span className="muted">Aucun</span>
+                  ) : (
+                    environment.assignedUsers.map((u) => u.email).join(', ')
+                  )}
+                </dd>
               </div>
               <div>
                 <dt>Ressources</dt>
@@ -84,28 +113,30 @@ export default function EnvironmentShow({ environment, credentials, logs }: Prop
               )}
             </dl>
 
-            <div className="actions-row">
-              <Form route="environments.start" routeParams={{ id: environment.id }}>
-                <button type="submit" className="btn">
-                  Démarrer
-                </button>
-              </Form>
-              <Form route="environments.stop" routeParams={{ id: environment.id }}>
-                <button type="submit" className="btn">
-                  Arrêter
-                </button>
-              </Form>
-              <Form route="environments.regenerateCredentials" routeParams={{ id: environment.id }}>
-                <button type="submit" className="btn">
-                  Régénérer identifiants
-                </button>
-              </Form>
-              <Form route="environments.destroy" routeParams={{ id: environment.id }}>
-                <button type="submit" className="btn btn-danger">
-                  Supprimer
-                </button>
-              </Form>
-            </div>
+            {canManage && (
+              <div className="actions-row">
+                <Form route="environments.start" routeParams={{ id: environment.id }}>
+                  <button type="submit" className="btn">
+                    Démarrer
+                  </button>
+                </Form>
+                <Form route="environments.stop" routeParams={{ id: environment.id }}>
+                  <button type="submit" className="btn">
+                    Arrêter
+                  </button>
+                </Form>
+                <Form route="environments.regenerateCredentials" routeParams={{ id: environment.id }}>
+                  <button type="submit" className="btn">
+                    Régénérer identifiants
+                  </button>
+                </Form>
+                <Form route="environments.destroy" routeParams={{ id: environment.id }}>
+                  <button type="submit" className="btn btn-danger">
+                    Supprimer
+                  </button>
+                </Form>
+              </div>
+            )}
           </section>
 
           <section className="card">
@@ -133,8 +164,32 @@ export default function EnvironmentShow({ environment, credentials, logs }: Prop
           </section>
         </div>
 
+        {canManage && availableUsers.length > 0 && (
+          <section className="card form-card">
+            <h2>Assigner des utilisateurs</h2>
+            <Form route="environments.assignUsers" routeParams={{ id: environment.id }} className="form">
+              <fieldset className="checkbox-group">
+                {availableUsers.map((user) => (
+                  <label key={user.id} className="checkbox">
+                    <input
+                      type="checkbox"
+                      name="assignedUserIds[]"
+                      value={user.id}
+                      defaultChecked={user.assigned}
+                    />
+                    {user.email}
+                  </label>
+                ))}
+              </fieldset>
+              <button type="submit" className="btn btn-primary">
+                Enregistrer les assignations
+              </button>
+            </Form>
+          </section>
+        )}
+
         <section className="card">
-          <h2>Journal</h2>
+          <h2>Journal plateforme</h2>
           {logs.length === 0 ? (
             <p className="muted">Aucun événement.</p>
           ) : (
@@ -148,6 +203,13 @@ export default function EnvironmentShow({ environment, credentials, logs }: Prop
             </ul>
           )}
         </section>
+
+        {dockerLogs && (
+          <section className="card">
+            <h2>Logs Docker (100 dernières lignes)</h2>
+            <pre className="docker-logs">{dockerLogs}</pre>
+          </section>
+        )}
       </div>
     </AppLayout>
   )

@@ -175,6 +175,18 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/environments_controller').default['regenerateCredentials']>>>
     }
   }
+  'environments.assignUsers': {
+    methods: ["POST"]
+    pattern: '/environments/:id/assign-users'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/environment').assignEnvironmentUsersValidator)>>
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/environment').assignEnvironmentUsersValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/environments_controller').default['assignUsers']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/environments_controller').default['assignUsers']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
   'environments.destroy': {
     methods: ["DELETE"]
     pattern: '/environments/:id'
@@ -269,6 +281,102 @@ export interface Registry {
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/image_templates_controller').default['index']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/image_templates_controller').default['index']>>>
+    }
+  }
+  'images.create': {
+    methods: ["GET","HEAD"]
+    pattern: '/images/create'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/image_templates_controller').default['create']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/image_templates_controller').default['create']>>>
+    }
+  }
+  'images.store': {
+    methods: ["POST"]
+    pattern: '/images'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/image_template').createImageTemplateValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/image_template').createImageTemplateValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/image_templates_controller').default['store']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/image_templates_controller').default['store']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'images.show': {
+    methods: ["GET","HEAD"]
+    pattern: '/images/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/image_templates_controller').default['show']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/image_templates_controller').default['show']>>>
+    }
+  }
+  'images.edit': {
+    methods: ["GET","HEAD"]
+    pattern: '/images/:id/edit'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/image_templates_controller').default['edit']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/image_templates_controller').default['edit']>>>
+    }
+  }
+  'images.update': {
+    methods: ["PUT"]
+    pattern: '/images/:id'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/image_template').updateImageTemplateValidator)>>
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/image_template').updateImageTemplateValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/image_templates_controller').default['update']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/image_templates_controller').default['update']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'images.build': {
+    methods: ["POST"]
+    pattern: '/images/:id/build'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/image_templates_controller').default['build']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/image_templates_controller').default['build']>>>
+    }
+  }
+  'images.destroy': {
+    methods: ["DELETE"]
+    pattern: '/images/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/image_templates_controller').default['destroy']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/image_templates_controller').default['destroy']>>>
+    }
+  }
+  'settings.index': {
+    methods: ["GET","HEAD"]
+    pattern: '/settings'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['index']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['index']>>>
     }
   }
 }

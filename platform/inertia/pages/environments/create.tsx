@@ -8,6 +8,7 @@ type Template = {
   dockerImage: string
   description: string | null
   isDefault: boolean
+  buildStatus: string
 }
 
 type UserOption = {
@@ -48,23 +49,38 @@ export default function EnvironmentsCreate({ templates, users, defaults }: Props
                     {templates.map((template) => (
                       <option key={template.id} value={template.id}>
                         {template.name}
+                        {template.buildStatus !== 'success' && template.buildStatus !== 'idle'
+                          ? ` (${template.buildStatus})`
+                          : ''}
                       </option>
                     ))}
                   </select>
                 </label>
 
                 {users.length > 0 && (
-                  <label>
-                    Propriétaire
-                    <select name="ownerId" defaultValue="">
-                      <option value="">Moi-même</option>
+                  <>
+                    <label>
+                      Propriétaire
+                      <select name="ownerId" defaultValue="">
+                        <option value="">Moi-même</option>
+                        {users.map((user) => (
+                          <option key={user.id} value={user.id}>
+                            {user.email} ({user.role})
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+
+                    <fieldset className="checkbox-group">
+                      <legend>Utilisateurs assignés (accès partagé)</legend>
                       {users.map((user) => (
-                        <option key={user.id} value={user.id}>
-                          {user.email} ({user.role})
-                        </option>
+                        <label key={user.id} className="checkbox">
+                          <input type="checkbox" name="assignedUserIds[]" value={user.id} />
+                          {user.email}
+                        </label>
                       ))}
-                    </select>
-                  </label>
+                    </fieldset>
+                  </>
                 )}
 
                 <div className="form-row">

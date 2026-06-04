@@ -23,6 +23,7 @@ export interface ApiDefinition {
     start: typeof routes['environments.start']
     stop: typeof routes['environments.stop']
     regenerateCredentials: typeof routes['environments.regenerateCredentials']
+    assignUsers: typeof routes['environments.assignUsers']
     destroy: typeof routes['environments.destroy']
   }
   users: {
@@ -35,5 +36,15 @@ export interface ApiDefinition {
   }
   images: {
     index: typeof routes['images.index']
+    create: typeof routes['images.create']
+    store: typeof routes['images.store']
+    show: typeof routes['images.show']
+    edit: typeof routes['images.edit']
+    update: typeof routes['images.update']
+    build: typeof routes['images.build']
+    destroy: typeof routes['images.destroy']
+  }
+  settings: {
+    index: typeof routes['settings.index']
   }
 }

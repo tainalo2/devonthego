@@ -88,6 +88,14 @@ chmod +x images/build-image.sh
 
 Les volumes de workspace sont montés manuellement dans `/data/workspaces/{slug}`. Pensez à sauvegarder ce répertoire régulièrement.
 
+### Maintenance
+
+Synchroniser les statuts Docker (cron recommandé toutes les minutes) :
+
+```bash
+docker compose exec platform node ace dotg:sync-environments
+```
+
 ## Licence
 
 MIT

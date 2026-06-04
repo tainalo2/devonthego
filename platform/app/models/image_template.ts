@@ -28,6 +28,18 @@ export default class ImageTemplate extends BaseModel {
   @column()
   declare isBuiltin: boolean
 
+  @column()
+  declare dockerfile: string | null
+
+  @column()
+  declare buildStatus: 'idle' | 'building' | 'success' | 'error'
+
+  @column()
+  declare buildError: string | null
+
+  @column.dateTime()
+  declare lastBuiltAt: DateTime | null
+
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
 

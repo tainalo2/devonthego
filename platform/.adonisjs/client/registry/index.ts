@@ -90,6 +90,12 @@ const routes = {
     tokens: [{"old":"/environments/:id/regenerate-credentials","type":0,"val":"environments","end":""},{"old":"/environments/:id/regenerate-credentials","type":1,"val":"id","end":""},{"old":"/environments/:id/regenerate-credentials","type":0,"val":"regenerate-credentials","end":""}],
     types: placeholder as Registry['environments.regenerateCredentials']['types'],
   },
+  'environments.assignUsers': {
+    methods: ["POST"],
+    pattern: '/environments/:id/assign-users',
+    tokens: [{"old":"/environments/:id/assign-users","type":0,"val":"environments","end":""},{"old":"/environments/:id/assign-users","type":1,"val":"id","end":""},{"old":"/environments/:id/assign-users","type":0,"val":"assign-users","end":""}],
+    types: placeholder as Registry['environments.assignUsers']['types'],
+  },
   'environments.destroy': {
     methods: ["DELETE"],
     pattern: '/environments/:id',
@@ -137,6 +143,54 @@ const routes = {
     pattern: '/images',
     tokens: [{"old":"/images","type":0,"val":"images","end":""}],
     types: placeholder as Registry['images.index']['types'],
+  },
+  'images.create': {
+    methods: ["GET","HEAD"],
+    pattern: '/images/create',
+    tokens: [{"old":"/images/create","type":0,"val":"images","end":""},{"old":"/images/create","type":0,"val":"create","end":""}],
+    types: placeholder as Registry['images.create']['types'],
+  },
+  'images.store': {
+    methods: ["POST"],
+    pattern: '/images',
+    tokens: [{"old":"/images","type":0,"val":"images","end":""}],
+    types: placeholder as Registry['images.store']['types'],
+  },
+  'images.show': {
+    methods: ["GET","HEAD"],
+    pattern: '/images/:id',
+    tokens: [{"old":"/images/:id","type":0,"val":"images","end":""},{"old":"/images/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['images.show']['types'],
+  },
+  'images.edit': {
+    methods: ["GET","HEAD"],
+    pattern: '/images/:id/edit',
+    tokens: [{"old":"/images/:id/edit","type":0,"val":"images","end":""},{"old":"/images/:id/edit","type":1,"val":"id","end":""},{"old":"/images/:id/edit","type":0,"val":"edit","end":""}],
+    types: placeholder as Registry['images.edit']['types'],
+  },
+  'images.update': {
+    methods: ["PUT"],
+    pattern: '/images/:id',
+    tokens: [{"old":"/images/:id","type":0,"val":"images","end":""},{"old":"/images/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['images.update']['types'],
+  },
+  'images.build': {
+    methods: ["POST"],
+    pattern: '/images/:id/build',
+    tokens: [{"old":"/images/:id/build","type":0,"val":"images","end":""},{"old":"/images/:id/build","type":1,"val":"id","end":""},{"old":"/images/:id/build","type":0,"val":"build","end":""}],
+    types: placeholder as Registry['images.build']['types'],
+  },
+  'images.destroy': {
+    methods: ["DELETE"],
+    pattern: '/images/:id',
+    tokens: [{"old":"/images/:id","type":0,"val":"images","end":""},{"old":"/images/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['images.destroy']['types'],
+  },
+  'settings.index': {
+    methods: ["GET","HEAD"],
+    pattern: '/settings',
+    tokens: [{"old":"/settings","type":0,"val":"settings","end":""}],
+    types: placeholder as Registry['settings.index']['types'],
   },
 } as const satisfies Record<string, AdonisEndpoint>
 

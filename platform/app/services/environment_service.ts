@@ -138,6 +138,7 @@ export default class EnvironmentService {
     try {
       const info = await this.docker.inspectContainer(environment.containerId)
       environment.status = info.State.Running ? 'running' : 'stopped'
+      environment.errorMessage = null
       await environment.save()
     } catch {
       environment.status = 'error'
@@ -146,6 +147,45 @@ export default class EnvironmentService {
     }
 
     return environment
+  }
+
+  async syncAll(): Promise<number> {
+    const environments = await Environment.query().whereNot('status', 'deleting')
+    let updated = 0
+
+    for (const environment of environments) {
+      const before = environment.status
+      await this.syncStatus(environment)
+      if (before !== environment.status) {
+        updated++
+      }
+    }
+
+    return updated
+  }
+
+  async assignUsers(environment: Environment, userIds: number[]): Promise<void> {
+    const uniqueIds = [...new Set(userIds.filter((id) => id !== environment.ownerId))]
+    await environment.related('assignedUsers').sync(
+      Object.fromEntries(uniqueIds.map((id) => [id, { access_level: 'write' }]))
+    )
+    await this.log(
+      environment.id,
+      'info',
+      `Utilisateurs assignés mis à jour (${uniqueIds.length})`
+    )
+  }
+
+  async getDockerLogs(environment: Environment, tail = 100): Promise<string | null> {
+    if (!environment.containerId) {
+      return null
+    }
+
+    try {
+      return await this.docker.getContainerLogs(environment.containerId, tail)
+    } catch {
+      return null
+    }
   }
 
   async regenerateCredentials(environment: Environment): Promise<{ username: string; password: string }> {

@@ -1,6 +1,7 @@
 import User from '#models/user'
-import Environment from '#models/environment'
 import ImageTemplate from '#models/image_template'
+import Environment from '#models/environment'
+import EnvironmentService from '#services/environment_service'
 import dockerConfig from '#config/docker'
 import DockerService from '#services/docker_service'
 import type { HttpContext } from '@adonisjs/core/http'
@@ -9,6 +10,11 @@ export default class DashboardController {
   async index({ inertia, auth }: HttpContext) {
     const user = auth.user!
     const docker = new DockerService()
+    const envService = new EnvironmentService()
+
+    if (user.isAdmin) {
+      await envService.syncAll()
+    }
 
     const environmentsQuery = Environment.query()
       .preload('owner')

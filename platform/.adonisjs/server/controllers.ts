@@ -9,5 +9,6 @@ export const controllers = {
   ImageTemplates: () => import('#controllers/image_templates_controller'),
   NewAccount: () => import('#controllers/new_account_controller'),
   Session: () => import('#controllers/session_controller'),
+  Settings: () => import('#controllers/settings_controller'),
   Users: () => import('#controllers/users_controller'),
 }
