@@ -1,0 +1,39 @@
+/* eslint-disable prettier/prettier */
+import type { routes } from './index.ts'
+
+export interface ApiDefinition {
+  home: typeof routes['home']
+  newAccount: {
+    create: typeof routes['new_account.create']
+    store: typeof routes['new_account.store']
+  }
+  session: {
+    create: typeof routes['session.create']
+    store: typeof routes['session.store']
+    destroy: typeof routes['session.destroy']
+  }
+  dashboard: {
+    index: typeof routes['dashboard.index']
+  }
+  environments: {
+    index: typeof routes['environments.index']
+    create: typeof routes['environments.create']
+    store: typeof routes['environments.store']
+    show: typeof routes['environments.show']
+    start: typeof routes['environments.start']
+    stop: typeof routes['environments.stop']
+    regenerateCredentials: typeof routes['environments.regenerateCredentials']
+    destroy: typeof routes['environments.destroy']
+  }
+  users: {
+    index: typeof routes['users.index']
+    create: typeof routes['users.create']
+    store: typeof routes['users.store']
+    edit: typeof routes['users.edit']
+    update: typeof routes['users.update']
+    destroy: typeof routes['users.destroy']
+  }
+  images: {
+    index: typeof routes['images.index']
+  }
+}

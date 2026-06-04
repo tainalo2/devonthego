@@ -1,0 +1,11 @@
+.env
+.env.local
+*.log
+.DS_Store
+node_modules/
+platform/node_modules/
+platform/build/
+platform/tmp/
+platform/.env
+data/
+letsencrypt/
