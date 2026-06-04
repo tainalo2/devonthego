@@ -259,6 +259,66 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/environments_controller').default['destroy']>>>
     }
   }
+  'modules.search': {
+    methods: ["GET","HEAD"]
+    pattern: '/modules/search'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/environment_module').searchModulesValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/environment_modules_controller').default['search']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/environment_modules_controller').default['search']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'modules.curated': {
+    methods: ["GET","HEAD"]
+    pattern: '/modules/curated'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/environment_modules_controller').default['curated']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/environment_modules_controller').default['curated']>>>
+    }
+  }
+  'environments.modules.status': {
+    methods: ["GET","HEAD"]
+    pattern: '/environments/:id/modules/status'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/environment_modules_controller').default['status']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/environment_modules_controller').default['status']>>>
+    }
+  }
+  'environments.modules.store': {
+    methods: ["POST"]
+    pattern: '/environments/:id/modules'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/environment_module').installEnvironmentModulesValidator)>>
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/environment_module').installEnvironmentModulesValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/environment_modules_controller').default['store']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/environment_modules_controller').default['store']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'environments.modules.destroy': {
+    methods: ["DELETE"]
+    pattern: '/environments/:id/modules/:moduleId'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue, ParamValue]
+      params: { id: ParamValue; moduleId: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/environment_modules_controller').default['destroy']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/environment_modules_controller').default['destroy']>>>
+    }
+  }
   'users.index': {
     methods: ["GET","HEAD"]
     pattern: '/users'

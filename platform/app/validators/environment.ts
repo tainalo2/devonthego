@@ -10,6 +10,9 @@ export const createEnvironmentValidator = vine.compile(
     assignedUserIds: vine.array(vine.number()).optional(),
     gitRepoUrl: vine.string().trim().url().optional(),
     gitBranch: vine.string().trim().maxLength(120).optional(),
+    moduleKeys: vine
+      .array(vine.string().trim().regex(/^(curated|debian):[a-z0-9.+_-]+$/))
+      .optional(),
   })
 )
 

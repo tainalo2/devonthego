@@ -86,6 +86,7 @@ export default class EnvironmentsController {
         assignedUserIds: payload.assignedUserIds,
         gitRepoUrl: payload.gitRepoUrl || null,
         gitBranch: payload.gitBranch || null,
+        moduleKeys: payload.moduleKeys,
       })
 
       session.flash('success', i18n.t('flash.environments.created', { name: environment.name }))
@@ -111,6 +112,7 @@ export default class EnvironmentsController {
       .preload('owner')
       .preload('imageTemplate')
       .preload('assignedUsers')
+      .preload('modules', (query) => query.orderBy('display_name'))
       .firstOrFail()
 
     if (
@@ -179,6 +181,18 @@ export default class EnvironmentsController {
         gitBranch: environment.gitBranch,
         createdAt: environment.createdAt.toISO() ?? '',
       },
+      modules: environment.modules.map((module) => ({
+        id: module.id,
+        moduleKey: module.moduleKey,
+        displayName: module.displayName,
+        description: module.description,
+        source: module.source,
+        installType: module.installType,
+        packageRef: module.packageRef,
+        status: module.status,
+        errorMessage: module.errorMessage,
+        installedAt: module.installedAt?.toISO() ?? null,
+      })),
       credentials,
       logs: logs.map((log) => ({
         id: log.id,

@@ -43,7 +43,21 @@ export function useI18n() {
     return t(`messages.seeder.templates.${slug}.description`, undefined, fallback ?? slug)
   }
 
-  return { t, locale, supportedLocales, statusLabel, buildStatusLabel, roleLabel, webhookEventLabel, templateDescription }
+  function moduleStatusLabel(status: string): string {
+    return t(`messages.status.${status}`, undefined, status)
+  }
+
+  return {
+    t,
+    locale,
+    supportedLocales,
+    statusLabel,
+    buildStatusLabel,
+    roleLabel,
+    webhookEventLabel,
+    templateDescription,
+    moduleStatusLabel,
+  }
 }
 
 export const LOCALE_LABELS: Record<string, string> = {

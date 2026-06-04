@@ -342,7 +342,29 @@
     "building": "Building",
     "idle": "Idle",
     "success": "Success",
-    "failed": "Failed"
+    "failed": "Failed",
+    "pending": "Pending",
+    "installing": "Installing",
+    "installed": "Installed",
+    "removing": "Removing"
+  },
+  "modules": {
+    "title": "Additional modules",
+    "createHint": "Optional tools installed into the environment after the container starts (apt packages from Debian).",
+    "manageHint": "Install or remove extra CLI tools at any time via apt inside the running container.",
+    "searchLabel": "Search modules",
+    "searchPlaceholder": "vim, jq, htop…",
+    "searchError": "Unable to search the module catalog.",
+    "curatedTitle": "Recommended",
+    "debianTitle": "Debian packages",
+    "sourceCurated": "Recommended",
+    "sourceDebian": "Debian",
+    "noResults": "No packages found. Try another name.",
+    "noneInstalled": "No additional modules installed.",
+    "addModules": "Add modules",
+    "installSelected": "Install selected",
+    "remove": "Remove",
+    "startRequired": "Start the environment before installing modules."
   },
   "seeder": {
     "base": {

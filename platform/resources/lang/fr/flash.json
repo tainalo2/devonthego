@@ -41,5 +41,11 @@
     "updated": "Utilisateur mis à jour.",
     "cannot_delete_self": "Vous ne pouvez pas supprimer votre propre compte.",
     "deleted": "Utilisateur supprimé."
+  },
+  "modules": {
+    "installed": "Installation des modules lancée.",
+    "install_failed": "Échec de l'installation du module.",
+    "removed": "Module retiré.",
+    "remove_failed": "Échec de la suppression du module."
   }
 }

@@ -1,6 +1,7 @@
 import AppLayout from '~/layouts/app'
 import { Form, Link } from '@adonisjs/inertia/react'
 import { useI18n } from '~/hooks/use_i18n'
+import ModulePicker from '~/components/module_picker'
 
 type Template = {
   id: number
@@ -126,6 +127,8 @@ export default function EnvironmentsCreate({ templates, users, defaults }: Props
                   </label>
                   <p className="muted small">{t('messages.environments.form.gitHint')}</p>
                 </fieldset>
+
+                <ModulePicker />
 
                 <button type="submit" className="btn btn-primary">
                   {t('messages.environments.form.submitCreate')}

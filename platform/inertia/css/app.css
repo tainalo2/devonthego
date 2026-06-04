@@ -641,3 +641,135 @@ textarea {
   white-space: nowrap;
   border: 0;
 }
+
+/* Module picker */
+.module-picker {
+  border: 1px solid var(--gray-3);
+  border-radius: 8px;
+  padding: 16px;
+  margin-top: 8px;
+}
+
+.module-search-label input {
+  width: 100%;
+  margin-top: 6px;
+}
+
+.module-selected {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 12px 0;
+}
+
+.module-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--gray-2);
+  border: 1px solid var(--gray-3);
+  font-size: 14px;
+}
+
+.module-chip button {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 16px;
+  line-height: 1;
+  color: var(--gray-7);
+}
+
+.module-results {
+  margin-top: 16px;
+}
+
+.module-results h3 {
+  font-size: 14px;
+  margin-bottom: 8px;
+  color: var(--gray-8);
+}
+
+.module-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.module-result {
+  width: 100%;
+  text-align: left;
+  border: 1px solid var(--gray-3);
+  border-radius: 6px;
+  padding: 10px 12px;
+  background: #fff;
+  cursor: pointer;
+  display: grid;
+  gap: 4px;
+}
+
+.module-result:hover {
+  border-color: var(--gray-6);
+  background: var(--gray-1);
+}
+
+.module-badge {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--gray-7);
+}
+
+.module-installed-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 16px 0;
+}
+
+.module-installed-item {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: flex-start;
+  padding: 12px;
+  border: 1px solid var(--gray-3);
+  border-radius: 6px;
+}
+
+.module-installed-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.module-manager-actions {
+  margin-top: 16px;
+}
+
+.module-add-panel {
+  margin-top: 12px;
+}
+
+.btn-small {
+  padding: 4px 10px;
+  font-size: 13px;
+}
+
+.badge-pending,
+.badge-installing,
+.badge-removing {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.badge-installed {
+  background: #dcfce7;
+  color: #166534;
+}

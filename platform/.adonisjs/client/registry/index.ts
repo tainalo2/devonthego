@@ -132,6 +132,36 @@ const routes = {
     tokens: [{"old":"/environments/:id","type":0,"val":"environments","end":""},{"old":"/environments/:id","type":1,"val":"id","end":""}],
     types: placeholder as Registry['environments.destroy']['types'],
   },
+  'modules.search': {
+    methods: ["GET","HEAD"],
+    pattern: '/modules/search',
+    tokens: [{"old":"/modules/search","type":0,"val":"modules","end":""},{"old":"/modules/search","type":0,"val":"search","end":""}],
+    types: placeholder as Registry['modules.search']['types'],
+  },
+  'modules.curated': {
+    methods: ["GET","HEAD"],
+    pattern: '/modules/curated',
+    tokens: [{"old":"/modules/curated","type":0,"val":"modules","end":""},{"old":"/modules/curated","type":0,"val":"curated","end":""}],
+    types: placeholder as Registry['modules.curated']['types'],
+  },
+  'environments.modules.status': {
+    methods: ["GET","HEAD"],
+    pattern: '/environments/:id/modules/status',
+    tokens: [{"old":"/environments/:id/modules/status","type":0,"val":"environments","end":""},{"old":"/environments/:id/modules/status","type":1,"val":"id","end":""},{"old":"/environments/:id/modules/status","type":0,"val":"modules","end":""},{"old":"/environments/:id/modules/status","type":0,"val":"status","end":""}],
+    types: placeholder as Registry['environments.modules.status']['types'],
+  },
+  'environments.modules.store': {
+    methods: ["POST"],
+    pattern: '/environments/:id/modules',
+    tokens: [{"old":"/environments/:id/modules","type":0,"val":"environments","end":""},{"old":"/environments/:id/modules","type":1,"val":"id","end":""},{"old":"/environments/:id/modules","type":0,"val":"modules","end":""}],
+    types: placeholder as Registry['environments.modules.store']['types'],
+  },
+  'environments.modules.destroy': {
+    methods: ["DELETE"],
+    pattern: '/environments/:id/modules/:moduleId',
+    tokens: [{"old":"/environments/:id/modules/:moduleId","type":0,"val":"environments","end":""},{"old":"/environments/:id/modules/:moduleId","type":1,"val":"id","end":""},{"old":"/environments/:id/modules/:moduleId","type":0,"val":"modules","end":""},{"old":"/environments/:id/modules/:moduleId","type":1,"val":"moduleId","end":""}],
+    types: placeholder as Registry['environments.modules.destroy']['types'],
+  },
   'users.index': {
     methods: ["GET","HEAD"],
     pattern: '/users',

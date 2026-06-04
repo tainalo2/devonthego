@@ -41,5 +41,11 @@
     "updated": "User updated.",
     "cannot_delete_self": "You cannot delete your own account.",
     "deleted": "User deleted."
+  },
+  "modules": {
+    "installed": "Modules installation started.",
+    "install_failed": "Module installation failed.",
+    "removed": "Module removed.",
+    "remove_failed": "Module removal failed."
   }
 }
