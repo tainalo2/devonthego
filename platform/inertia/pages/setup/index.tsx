@@ -31,7 +31,11 @@ export default function SetupIndex({ defaults, bootstrapUrl }: Props) {
             déployer la plateforme en production.
           </p>
           <p className="muted">
-            Accès actuel (bootstrap) : <code>{bootstrapUrl}</code>
+            Accès bootstrap (HTTPS autosigné) : <code>{bootstrapUrl}</code>
+          </p>
+          <p className="muted">
+            Acceptez l&apos;avertissement certificat du navigateur — les données du formulaire sont
+            chiffrées en transit.
           </p>
         </header>
 

@@ -13,10 +13,16 @@ export default function Login({ bootstrapMode = false }: Props) {
           <h1>Connexion</h1>
           <p>Connectez-vous à votre espace Dev on the go.</p>
           {bootstrapMode && (
-            <p className="muted">
-              Première installation ? Utilisez les identifiants affichés par <code>install.sh</code>,
-              puis suivez l&apos;assistant de configuration.
-            </p>
+            <>
+              <p className="muted">
+                Première installation ? Utilisez les identifiants affichés par <code>install.sh</code>,
+                puis suivez l&apos;assistant de configuration.
+              </p>
+              <p className="muted">
+                Le certificat TLS est <strong>autosigné</strong> — acceptez l&apos;avertissement de
+                sécurité du navigateur pour cette première connexion.
+              </p>
+            </>
           )}
         </div>
 

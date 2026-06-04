@@ -1,13 +1,13 @@
 import env from '#start/env'
-import app from '@adonisjs/core/services/app'
 import { defineConfig } from '@adonisjs/core/http'
+import { useSecureCookies } from '#config/secure_cookies'
 
 /**
  * The app URL can be used in various places where you want to create absolute
  * URLs to your application. For example, when sending emails, images should
  * use absolute URLs.
  */
-export const appUrl = env.get('APP_URL', 'http://localhost:8080')
+export const appUrl = env.get('APP_URL', 'https://localhost:8443')
 
 /**
  * The configuration settings used by the HTTP server
@@ -74,7 +74,7 @@ export const http = defineConfig({
     /**
      * Send cookies only over HTTPS in production.
      */
-    secure: app.inProduction && !env.get('BOOTSTRAP_MODE', false),
+    secure: useSecureCookies(),
 
     /**
      * Cross-site policy for cookie sending.

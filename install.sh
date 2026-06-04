@@ -5,15 +5,18 @@ set -euo pipefail
 # Usage: curl -fsSL .../install.sh | bash
 #    or: ./install.sh
 #
-# Par défaut : installation zero-config (accès IP:8080 + assistant web /setup)
-#    ./install.sh --interactive     Configuration CLI complète (sans assistant web)
+# Par défaut : zero-config HTTPS autosigné (port 8443) + assistant web /setup
+#    ./install.sh --configure-cli  Configuration CLI (stack bootstrap déjà démarrée)
+#    ./install.sh --interactive    Configuration CLI avant tout démarrage web
 #    ./install.sh --non-interactive Conserve le .env existant
 
 REPO_URL="${DOTG_REPO_URL:-https://github.com/tainalo2/devonthego.git}"
-INSTALL_DIR="${DOTG_INSTALL_DIR:-/opt/devonthego}"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+INSTALL_DIR="${DOTG_INSTALL_DIR:-${SCRIPT_DIR}}"
 INSTALL_MODE="bootstrap"
 NON_INTERACTIVE=false
 COMPOSE_FILES=(-f docker-compose.yml -f docker-compose.bootstrap.yml)
+BOOTSTRAP_PORT=8443
 
 log() { echo "[devonthego] $*"; }
 error() { echo "[devonthego] ERROR: $*" >&2; exit 1; }
@@ -26,20 +29,22 @@ parse_args() {
   for arg in "$@"; do
     case "${arg}" in
       --interactive) INSTALL_MODE="interactive" ;;
+      --configure-cli) INSTALL_MODE="configure-cli" ;;
       --non-interactive) NON_INTERACTIVE=true ;;
       -h|--help)
         cat <<EOF
 Usage: install.sh [options]
 
 Options:
-  (défaut)            Installation zero-config : accès http://IP:8080 + wizard web
-  --interactive       Configuration CLI complète avant déploiement HTTPS
+  (défaut)            Zero-config : HTTPS autosigné sur :${BOOTSTRAP_PORT} + wizard web
+  --configure-cli     Configuration CLI (après démarrage bootstrap, sans navigateur)
+  --interactive       Configuration CLI complète avant déploiement (sans wizard web)
   --non-interactive   Conserve le .env existant sans questions
   -h, --help          Affiche cette aide
 
 Variables d'environnement:
   DOTG_REPO_URL       URL du dépôt Git
-  DOTG_INSTALL_DIR    Répertoire d'installation (défaut: /opt/devonthego)
+  DOTG_INSTALL_DIR    Répertoire d'installation (défaut: emplacement du script)
 EOF
         exit 0
         ;;
@@ -93,11 +98,11 @@ configure_firewall() {
     return
   fi
 
-  log "Configuration du firewall (ports 22, 80, 443, 8080)..."
+  log "Configuration du firewall (ports 22, 80, 443, ${BOOTSTRAP_PORT})..."
   ufw allow 22/tcp
   ufw allow 80/tcp
   ufw allow 443/tcp
-  ufw allow 8080/tcp
+  ufw allow "${BOOTSTRAP_PORT}"/tcp
   ufw --force enable || true
 }
 
@@ -163,6 +168,15 @@ write_env_file() {
   chmod 600 "${env_file}"
 }
 
+generate_bootstrap_certs() {
+  local server_ip="$1"
+  local cert_dir="${INSTALL_DIR}/certs/bootstrap"
+  local gen_script="${INSTALL_DIR}/scripts/generate-bootstrap-certs.sh"
+
+  [[ -x "${gen_script}" ]] || chmod +x "${gen_script}"
+  "${gen_script}" "${cert_dir}" "${server_ip}"
+}
+
 generate_bootstrap_env() {
   if [[ -f "${INSTALL_DIR}/.env" && "${NON_INTERACTIVE}" == "true" ]]; then
     log "Mode non-interactif : .env conservé tel quel."
@@ -185,6 +199,8 @@ generate_bootstrap_env() {
   app_key="$(openssl rand -base64 32)"
   bootstrap_password="$(openssl rand -base64 12)"
 
+  generate_bootstrap_certs "${server_ip}"
+
   # shellcheck disable=SC2034
   BOOTSTRAP_MODE=true
   DOTG_INSTALL_DIR="${INSTALL_DIR}"
@@ -196,13 +212,14 @@ generate_bootstrap_env() {
   BOOTSTRAP_ADMIN_EMAIL=admin@bootstrap.local
   BOOTSTRAP_ADMIN_PASSWORD="${bootstrap_password}"
   APP_KEY="${app_key}"
-  APP_URL="http://${server_ip}:8080"
+  APP_URL="https://${server_ip}:${BOOTSTRAP_PORT}"
   ALLOW_PUBLIC_SIGNUP=false
   ENV_CPU_LIMIT=1
   ENV_MEMORY_LIMIT=1024m
 
   write_env_file
   chmod +x "${INSTALL_DIR}/scripts/finish-setup.sh" 2>/dev/null || true
+  chmod +x "${INSTALL_DIR}/scripts/generate-bootstrap-certs.sh" 2>/dev/null || true
 
   log "Configuration bootstrap générée (${INSTALL_DIR}/.env)"
   export BOOTSTRAP_SUMMARY_IP="${server_ip}"
@@ -299,7 +316,7 @@ prompt_env_interactive() {
 
   echo ""
   echo "╔══════════════════════════════════════════════════════════════╗"
-  echo "║     Configuration Dev on the go (mode interactif CLI)         ║"
+  echo "║     Configuration Dev on the go (mode CLI)                  ║"
   echo "╚══════════════════════════════════════════════════════════════╝"
 
   # shellcheck disable=SC2034
@@ -318,6 +335,9 @@ prompt_env_interactive() {
   BOOTSTRAP_ADMIN_EMAIL=
   BOOTSTRAP_ADMIN_PASSWORD=
 
+  [[ "${DOMAIN}" == "bootstrap.local" ]] && DOMAIN=""
+  [[ "${ACME_EMAIL}" == *"@local.invalid" ]] && ACME_EMAIL=""
+
   ADMIN_FULL_NAME="${ADMIN_FULL_NAME:-Administrator}"
   ALLOW_PUBLIC_SIGNUP="${ALLOW_PUBLIC_SIGNUP:-false}"
   ENV_CPU_LIMIT="${ENV_CPU_LIMIT:-1}"
@@ -333,7 +353,7 @@ prompt_env_interactive() {
   fi
 
   local default_app_url="https://admin.${DOMAIN}"
-  if [[ -z "${APP_URL}" || "${APP_URL}" == *"example.com"* ]]; then
+  if [[ -z "${APP_URL}" || "${APP_URL}" == *"example.com"* || "${APP_URL}" == *":8443"* ]]; then
     APP_URL="${default_app_url}"
   fi
   confirm_or_prompt APP_URL "URL interface admin" "${APP_URL}"
@@ -353,7 +373,7 @@ prompt_env_interactive() {
 configure_env() {
   if [[ "${INSTALL_MODE}" == "interactive" ]]; then
     prompt_env_interactive
-  else
+  elif [[ "${INSTALL_MODE}" != "configure-cli" ]]; then
     generate_bootstrap_env
   fi
 }
@@ -390,6 +410,50 @@ start_stack() {
   sleep 15
 }
 
+apply_cli_configuration() {
+  [[ -f "${INSTALL_DIR}/.env" ]] || error "Aucune installation dans ${INSTALL_DIR}"
+
+  local bootstrap_mode
+  bootstrap_mode="$(read_env_value BOOTSTRAP_MODE "${INSTALL_DIR}/.env")"
+  [[ "${bootstrap_mode}" == "true" ]] || error "Configuration déjà terminée (BOOTSTRAP_MODE=false)."
+
+  COMPOSE_FILES=(-f docker-compose.yml -f docker-compose.bootstrap.yml)
+  prompt_env_interactive
+
+  cd "${INSTALL_DIR}"
+  export DOTG_INSTALL_DIR="${INSTALL_DIR}"
+
+  log "Enregistrement de la configuration dans la base..."
+  docker compose "${COMPOSE_FILES[@]}" exec -T platform node build/ace.js dotg:complete-setup-cli
+
+  log "Basculage vers le mode production HTTPS..."
+  bash "${INSTALL_DIR}/scripts/finish-setup.sh" "${INSTALL_DIR}"
+
+  log "Attente du redémarrage..."
+  sleep 20
+
+  INSTALL_MODE="production"
+  print_summary_production
+}
+
+offer_cli_configuration() {
+  [[ "${INSTALL_MODE}" == "bootstrap" ]] || return
+  [[ "${NON_INTERACTIVE}" == "true" ]] && return
+
+  echo ""
+  echo "──────────────────────────────────────────────────────────────"
+  echo "Le portail web est démarré. Configuration possible :"
+  echo "  • Navigateur : https://<IP>:${BOOTSTRAP_PORT} (certificat autosigné)"
+  echo "  • SSH plus tard : ${INSTALL_DIR}/install.sh --configure-cli"
+  echo "──────────────────────────────────────────────────────────────"
+
+  local answer
+  read -rp "Configurer maintenant en CLI (sans navigateur) ? [o/N] " answer
+  if [[ "${answer,,}" =~ ^(o|oui|y|yes)$ ]]; then
+    apply_cli_configuration
+  fi
+}
+
 print_summary_bootstrap() {
   local ip="${BOOTSTRAP_SUMMARY_IP:-$(detect_public_ip)}"
   local password="${BOOTSTRAP_SUMMARY_PASSWORD:-}"
@@ -403,12 +467,14 @@ print_summary_bootstrap() {
 ╔══════════════════════════════════════════════════════════════╗
 ║        Dev on the go — Installation bootstrap terminée       ║
 ╠══════════════════════════════════════════════════════════════╣
-║  1. Ouvrez :  http://${ip}:8080
-║  2. Connectez-vous avec :
-║       Email      admin@bootstrap.local
-║       Mot de passe  ${password}
-║  3. Suivez l'assistant de configuration (/setup)
+║  1. Ouvrez :  https://${ip}:${BOOTSTRAP_PORT}
+║     (certificat autosigné — acceptez l'avertissement navigateur)
+║  2. Connectez-vous :
+║       Email           admin@bootstrap.local
+║       Mot de passe    ${password}
+║  3. Suivez l'assistant /setup
 ╠══════════════════════════════════════════════════════════════╣
+║  Sans navigateur : ${INSTALL_DIR}/install.sh --configure-cli
 ║  Après configuration : https://admin.<votre-domaine>
 ╚══════════════════════════════════════════════════════════════╝
 EOF
@@ -440,6 +506,12 @@ print_summary() {
 main() {
   parse_args "$@"
   require_root
+
+  if [[ "${INSTALL_MODE}" == "configure-cli" ]]; then
+    apply_cli_configuration
+    exit 0
+  fi
+
   detect_os
   install_docker
   configure_firewall
@@ -448,6 +520,7 @@ main() {
   build_images
   start_stack
   print_summary
+  offer_cli_configuration
 }
 
 main "$@"

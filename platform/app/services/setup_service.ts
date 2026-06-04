@@ -95,39 +95,117 @@ export default class SetupService {
     await writeFile(envPath, `${lines.join('\n').trimEnd()}\n`, { mode: 0o600 })
   }
 
-  static async completeSetup(payload: SetupPayload, adminUser: User): Promise<{ appUrl: string }> {
-    const appKey = env.get('APP_KEY').release()
-    const appUrl = `https://admin.${payload.domain}`
-
-    const envUpdates: Record<string, string> = {
+  static buildProductionEnvUpdates(payload: SetupPayload, appKey: string): Record<string, string> {
+    return {
       BOOTSTRAP_MODE: 'false',
       DOMAIN: payload.domain,
       ACME_EMAIL: payload.acmeEmail,
       ADMIN_EMAIL: payload.adminEmail,
       ADMIN_FULL_NAME: payload.adminFullName,
       ADMIN_PASSWORD: payload.adminPassword,
+      BOOTSTRAP_ADMIN_EMAIL: '',
+      BOOTSTRAP_ADMIN_PASSWORD: '',
       APP_KEY: appKey,
-      APP_URL: appUrl,
+      APP_URL: `https://admin.${payload.domain}`,
       ALLOW_PUBLIC_SIGNUP: payload.allowPublicSignup ? 'true' : 'false',
       ENV_CPU_LIMIT: String(payload.envCpuLimit),
       ENV_MEMORY_LIMIT: payload.envMemoryLimit,
       DOTG_INSTALL_DIR: this.installDir(),
     }
+  }
 
-    adminUser.merge({
-      email: payload.adminEmail,
-      fullName: payload.adminFullName,
-      password: payload.adminPassword,
-    })
-    await adminUser.save()
+  static async persistAdminUser(payload: SetupPayload, existingUser?: User | null): Promise<User> {
+    const bootstrapEmail = (await this.readEnvFile()).get('BOOTSTRAP_ADMIN_EMAIL')
 
-    await this.writeEnvFile(envUpdates)
+    if (existingUser) {
+      existingUser.merge({
+        email: payload.adminEmail,
+        fullName: payload.adminFullName,
+        password: payload.adminPassword,
+        role: 'admin',
+        isActive: true,
+      })
+      await existingUser.save()
 
+      if (bootstrapEmail && bootstrapEmail !== payload.adminEmail) {
+        await User.query().where('email', bootstrapEmail).delete()
+      }
+
+      return existingUser
+    }
+
+    const user = await User.updateOrCreate(
+      { email: payload.adminEmail },
+      {
+        email: payload.adminEmail,
+        fullName: payload.adminFullName,
+        password: payload.adminPassword,
+        role: 'admin',
+        isActive: true,
+      }
+    )
+
+    if (bootstrapEmail && bootstrapEmail !== payload.adminEmail) {
+      await User.query().where('email', bootstrapEmail).delete()
+    }
+
+    return user
+  }
+
+  static async markSetupCompleted(): Promise<void> {
     const settings = await PlatformSetting.getSingleton()
     settings.setupCompleted = true
     settings.setupCompletedAt = DateTime.now()
     await settings.save()
+  }
 
+  static payloadFromEnvFile(values: Map<string, string>): SetupPayload {
+    const required = [
+      'DOMAIN',
+      'ACME_EMAIL',
+      'ADMIN_EMAIL',
+      'ADMIN_FULL_NAME',
+      'ADMIN_PASSWORD',
+      'ENV_CPU_LIMIT',
+      'ENV_MEMORY_LIMIT',
+    ] as const
+
+    for (const key of required) {
+      if (!values.get(key)) {
+        throw new Error(`Variable ${key} manquante dans .env`)
+      }
+    }
+
+    return {
+      domain: values.get('DOMAIN')!,
+      acmeEmail: values.get('ACME_EMAIL')!,
+      adminEmail: values.get('ADMIN_EMAIL')!,
+      adminFullName: values.get('ADMIN_FULL_NAME')!,
+      adminPassword: values.get('ADMIN_PASSWORD')!,
+      allowPublicSignup: values.get('ALLOW_PUBLIC_SIGNUP') === 'true',
+      envCpuLimit: Number(values.get('ENV_CPU_LIMIT')),
+      envMemoryLimit: values.get('ENV_MEMORY_LIMIT')!,
+    }
+  }
+
+  static async completeSetupFromEnvFile(): Promise<{ appUrl: string }> {
+    const values = await this.readEnvFile()
+    const payload = this.payloadFromEnvFile(values)
+
+    await this.persistAdminUser(payload)
+    await this.markSetupCompleted()
+
+    const appUrl = values.get('APP_URL') ?? `https://admin.${payload.domain}`
+    return { appUrl }
+  }
+
+  static async completeSetup(payload: SetupPayload, adminUser: User): Promise<{ appUrl: string }> {
+    const appKey = env.get('APP_KEY').release()
+    const appUrl = `https://admin.${payload.domain}`
+
+    await this.persistAdminUser(payload, adminUser)
+    await this.writeEnvFile(this.buildProductionEnvUpdates(payload, appKey))
+    await this.markSetupCompleted()
     this.scheduleProductionDeploy()
 
     return { appUrl }
