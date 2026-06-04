@@ -1,6 +1,7 @@
 import { DateTime } from 'luxon'
-import { BaseModel, belongsTo, column, manyToMany } from '@adonisjs/lucid/orm'
-import type { BelongsTo, ManyToMany } from '@adonisjs/lucid/types/relations'
+import { BaseModel, belongsTo, column, hasMany, manyToMany } from '@adonisjs/lucid/orm'
+import type { BelongsTo, HasMany, ManyToMany } from '@adonisjs/lucid/types/relations'
+import EnvironmentModule from '#models/environment_module'
 import ImageTemplate from '#models/image_template'
 import User from '#models/user'
 
@@ -81,4 +82,7 @@ export default class Environment extends BaseModel {
     pivotColumns: ['access_level'],
   })
   declare assignedUsers: ManyToMany<typeof User>
+
+  @hasMany(() => EnvironmentModule)
+  declare modules: HasMany<typeof EnvironmentModule>
 }

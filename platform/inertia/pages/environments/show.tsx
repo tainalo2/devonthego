@@ -1,6 +1,7 @@
 import AppLayout from '~/layouts/app'
 import { Form, Link } from '@adonisjs/inertia/react'
 import { useI18n } from '~/hooks/use_i18n'
+import ModuleManager, { type EnvironmentModule } from '~/components/module_manager'
 
 type Environment = {
   id: number
@@ -37,6 +38,7 @@ type AvailableUser = {
 
 type Props = {
   environment: Environment
+  modules: EnvironmentModule[]
   credentials: { username: string; password: string } | null
   logs: Log[]
   dockerLogs: string | null
@@ -47,6 +49,7 @@ type Props = {
 
 export default function EnvironmentShow({
   environment,
+  modules,
   credentials,
   logs,
   dockerLogs,
@@ -216,6 +219,13 @@ export default function EnvironmentShow({
             </Form>
           </section>
         )}
+
+        <ModuleManager
+          environmentId={environment.id}
+          modules={modules}
+          canManage={canManage}
+          environmentStatus={environment.status}
+        />
 
         <section className="card">
           <h2>{t('messages.environments.show.platformLog')}</h2>

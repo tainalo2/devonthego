@@ -9,6 +9,7 @@ import DockerService from '#services/docker_service'
 import GitService from '#services/git_service'
 import SlugService from '#services/slug_service'
 import TraefikAuthService from '#services/traefik_auth_service'
+import ModuleProvisionerService from '#services/module_provisioner_service'
 import WebhookService, { type WebhookEvent } from '#services/webhook_service'
 
 export type CreateEnvironmentInput = {
@@ -21,6 +22,7 @@ export type CreateEnvironmentInput = {
   assignedUserIds?: number[]
   gitRepoUrl?: string | null
   gitBranch?: string | null
+  moduleKeys?: string[]
 }
 
 export type UpdateEnvironmentInput = {
@@ -92,6 +94,12 @@ export default class EnvironmentService {
       environment.status = 'running'
       await environment.save()
       await this.log(environment.id, 'info', 'Conteneur démarré avec succès')
+
+      if (input.moduleKeys?.length) {
+        const provisioner = new ModuleProvisionerService()
+        await provisioner.installMany(environment, input.moduleKeys)
+      }
+
       await this.notify('environment.created', environment)
       await this.notify('environment.started', environment)
     } catch (error) {

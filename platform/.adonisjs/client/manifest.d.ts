@@ -7,4 +7,7 @@
 /// <reference path="../../config/auth.ts" />
 /// <reference path="../../config/docker.ts" />
 /// <reference path="../../config/hash.ts" />
+/// <reference path="../../config/i18n.ts" />
 /// <reference path="../../config/logger.ts" />
+/// <reference path="../../config/modules.ts" />
+/// <reference path="../../config/secure_cookies.ts" />

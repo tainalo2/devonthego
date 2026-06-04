@@ -34,6 +34,15 @@ export interface ApiDefinition {
     regenerateCredentials: typeof routes['environments.regenerateCredentials']
     assignUsers: typeof routes['environments.assignUsers']
     destroy: typeof routes['environments.destroy']
+    modules: {
+      status: typeof routes['environments.modules.status']
+      store: typeof routes['environments.modules.store']
+      destroy: typeof routes['environments.modules.destroy']
+    }
+  }
+  modules: {
+    search: typeof routes['modules.search']
+    curated: typeof routes['modules.curated']
   }
   users: {
     index: typeof routes['users.index']

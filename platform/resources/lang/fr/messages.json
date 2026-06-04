@@ -342,7 +342,29 @@
     "building": "Build en cours",
     "idle": "Inactif",
     "success": "Success",
-    "failed": "Échec"
+    "failed": "Échec",
+    "pending": "En attente",
+    "installing": "Installation",
+    "installed": "Installé",
+    "removing": "Suppression"
+  },
+  "modules": {
+    "title": "Modules supplémentaires",
+    "createHint": "Outils optionnels installés dans l'environnement après le démarrage du conteneur (paquets apt Debian).",
+    "manageHint": "Installez ou retirez des outils CLI à tout moment via apt dans le conteneur en cours d'exécution.",
+    "searchLabel": "Rechercher des modules",
+    "searchPlaceholder": "vim, jq, htop…",
+    "searchError": "Impossible de rechercher dans le catalogue.",
+    "curatedTitle": "Recommandés",
+    "debianTitle": "Paquets Debian",
+    "sourceCurated": "Recommandé",
+    "sourceDebian": "Debian",
+    "noResults": "Aucun paquet trouvé. Essayez un autre nom.",
+    "noneInstalled": "Aucun module supplémentaire installé.",
+    "addModules": "Ajouter des modules",
+    "installSelected": "Installer la sélection",
+    "remove": "Retirer",
+    "startRequired": "Démarrez l'environnement avant d'installer des modules."
   },
   "seeder": {
     "base": {

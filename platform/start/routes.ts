@@ -87,6 +87,20 @@ router
       .use(middleware.canManageEnvironment())
       .as('environments.destroy')
 
+    router.get('modules/search', [controllers.EnvironmentModules, 'search']).as('modules.search')
+    router.get('modules/curated', [controllers.EnvironmentModules, 'curated']).as('modules.curated')
+    router
+      .get('environments/:id/modules/status', [controllers.EnvironmentModules, 'status'])
+      .as('environments.modules.status')
+    router
+      .post('environments/:id/modules', [controllers.EnvironmentModules, 'store'])
+      .use(middleware.canManageEnvironment())
+      .as('environments.modules.store')
+    router
+      .delete('environments/:id/modules/:moduleId', [controllers.EnvironmentModules, 'destroy'])
+      .use(middleware.canManageEnvironment())
+      .as('environments.modules.destroy')
+
     router
       .group(() => {
         router.get('users', [controllers.Users, 'index']).as('users.index')

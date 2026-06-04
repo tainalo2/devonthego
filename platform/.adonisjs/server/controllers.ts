@@ -5,6 +5,7 @@
 
 export const controllers = {
   Dashboard: () => import('#controllers/dashboard_controller'),
+  EnvironmentModules: () => import('#controllers/environment_modules_controller'),
   Environments: () => import('#controllers/environments_controller'),
   ImageTemplates: () => import('#controllers/image_templates_controller'),
   Locale: () => import('#controllers/locale_controller'),
