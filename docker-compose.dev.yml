@@ -1,0 +1,30 @@
+name: devonthego-dev
+
+services:
+  traefik:
+    command:
+      - --log.level=DEBUG
+      - --api.dashboard=true
+      - --api.insecure=true
+      - --providers.docker=true
+      - --providers.docker.exposedbydefault=false
+      - --providers.docker.network=devonthego
+      - --entrypoints.web.address=:80
+    ports:
+      - '8080:8080'
+
+  platform:
+    build:
+      target: development
+    environment:
+      NODE_ENV: development
+      APP_URL: http://admin.localhost
+      DOMAIN: localhost
+      ALLOW_PUBLIC_SIGNUP: 'true'
+    ports:
+      - '3333:3333'
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.platform.rule=Host(`admin.localhost`)
+      - traefik.http.routers.platform.entrypoints=web
+      - traefik.http.services.platform.loadbalancer.server.port=3333
