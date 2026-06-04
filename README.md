@@ -1,39 +1,130 @@
 # Dev on the go
 
-Plateforme d'environnements de développement contenairisés avec [OpenVSCode Server](https://github.com/gitpod-io/openvscode-server), accessible depuis n'importe quel navigateur.
+Containerized development environments powered by [OpenVSCode Server](https://github.com/gitpod-io/openvscode-server), accessible from any browser.
 
 ## Architecture
 
-- **Traefik** — reverse proxy HTTPS + basic auth par environnement
-- **Registry local** — images Docker custom
-- **AdonisJS 7 + React Inertia** — interface d'administration
-- **SQLite / libSQL** — base de données légère
-- **Docker socket** — orchestration des environnements de dev
-
-## Démarrage rapide (VPS)
-
-```bash
-curl -fsSL https://raw.githubusercontent.com/tainalo2/dev-on-the-go/main/install.sh | sudo bash
+```
+VPS
+ ├── Traefik          HTTPS reverse proxy + per-environment basic auth
+ ├── Local registry   Custom Docker images
+ ├── AdonisJS 7       Admin UI (React Inertia)
+ └── dotg-env-*       On-demand dev containers (OpenVSCode Server)
 ```
 
-Ou manuellement :
+| Component | Role |
+|-----------|------|
+| **Traefik** | TLS termination, routing (`admin.domain`, `slug.domain`) |
+| **Registry** | Local image storage (`registry:5000`) |
+| **Platform** | AdonisJS 7 + React Inertia admin interface |
+| **SQLite / libSQL** | Lightweight database |
+| **Docker socket** | Environment orchestration |
+
+## Quick start (VPS)
+
+One-liner install — zero configuration required:
 
 ```bash
-git clone https://github.com/tainalo2/dev-on-the-go.git /opt/devonthego
-cd /opt/devonthego
-cp .env.example .env
-# Éditer .env (DOMAIN, ACME_EMAIL, ADMIN_*)
-./install.sh
+curl -fsSL https://raw.githubusercontent.com/tainalo2/devonthego/main/install.sh | sudo bash
 ```
 
-## Développement local
+The script will:
 
-### Prérequis
+1. Install Docker and configure the firewall
+2. Clone the repository to `/opt/devonthego`
+3. Start the stack in **bootstrap mode** (self-signed HTTPS on port **8443**)
+4. Display temporary credentials and the setup URL
+
+### First-time setup
+
+**Option A — Web wizard (recommended)**
+
+1. Open `https://<server-ip>:8443` (accept the self-signed certificate warning)
+2. Sign in with the bootstrap credentials shown by `install.sh`
+3. Complete the `/setup` wizard (domain, Let's Encrypt, admin account, resource limits)
+4. Access production admin at `https://admin.<your-domain>`
+
+**Option B — CLI (no browser)**
+
+During install, answer `y` when prompted, or run later:
+
+```bash
+sudo /opt/devonthego/install.sh --configure-cli
+```
+
+**Option C — Full CLI before web start**
+
+```bash
+sudo ./install.sh --interactive
+```
+
+Skips bootstrap mode and deploys directly in production configuration.
+
+## Install script options
+
+| Flag | Description |
+|------|-------------|
+| *(default)* | Zero-config bootstrap + web wizard |
+| `--configure-cli` | Complete setup via SSH (stack already running) |
+| `--interactive` | Full CLI configuration before deployment |
+| `--non-interactive` | Keep existing `.env` without prompts |
+| `-h`, `--help` | Show help |
+
+### Environment variables
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `DOTG_REPO_URL` | Git repository URL | `https://github.com/tainalo2/devonthego.git` |
+| `DOTG_INSTALL_DIR` | Installation directory | `/opt/devonthego` |
+| `DOTG_LANG` | Script language (`en`, `fr`, `es`, `de`, `pt`, `it`) | `en` |
+
+Example — install in French:
+
+```bash
+DOTG_LANG=fr curl -fsSL .../install.sh | sudo bash
+```
+
+## Internationalization (i18n)
+
+### Web interface
+
+The admin platform supports **6 languages** with **English as the default**:
+
+| Code | Language |
+|------|----------|
+| `en` | English |
+| `fr` | French |
+| `es` | Spanish |
+| `de` | German |
+| `pt` | Portuguese |
+| `it` | Italian |
+
+- Default locale: **English**
+- Auto-detection via browser `Accept-Language` header
+- Manual switch via the language selector in the header (persisted in session)
+- Translation files: `platform/resources/lang/{locale}/`
+
+### Shell scripts
+
+All user-facing script messages are translated via `scripts/lib/i18n.sh`:
+
+| Script | Purpose |
+|--------|---------|
+| `install.sh` | VPS bootstrap and configuration |
+| `scripts/finish-setup.sh` | Switch from bootstrap to production HTTPS |
+| `scripts/generate-bootstrap-certs.sh` | Self-signed TLS certificate for bootstrap |
+| `images/build-image.sh` | Build custom environment images |
+
+Set `DOTG_LANG=fr` (or `es`, `de`, `pt`, `it`) before running any script.
+
+## Local development
+
+### Prerequisites
 
 - Node.js 24+
 - Docker + Docker Compose
 
-### Plateforme AdonisJS
+### AdonisJS platform only
 
 ```bash
 cd platform
@@ -45,64 +136,85 @@ node ace db:seed
 npm run dev
 ```
 
-Ouvrir http://localhost:3333
+Open http://localhost:3333
 
-### Stack complète (Docker)
+### Full stack (Docker)
 
 ```bash
 cp .env.example .env
 docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d --build
 ```
 
-## Scripts
+## Scripts reference
 
 | Script | Description |
 |--------|-------------|
-| `install.sh` | Bootstrap complet sur un VPS Linux |
-| `images/build-image.sh` | Construire une image d'environnement custom |
-| `images/base/Dockerfile` | Image de base OpenVSCode Server |
+| `install.sh` | Full VPS bootstrap: Docker, clone, images, stack, setup |
+| `scripts/finish-setup.sh` | Recreate Traefik + platform in production mode |
+| `scripts/generate-bootstrap-certs.sh` | Generate bootstrap TLS cert (IP SAN) |
+| `images/build-image.sh` | Build and optionally push custom env images |
+| `images/base/Dockerfile` | Base OpenVSCode Server image |
 
-### Exemples build image
+### Build custom images
 
 ```bash
 chmod +x images/build-image.sh
 
-# Image de base
+# Base image
 ./images/build-image.sh --build-base --name base --dockerfile images/base/Dockerfile
 
-# Template Node.js
+# Built-in template (node, python, php)
 ./images/build-image.sh --template node --name node --push
 
-# Dockerfile custom
-./images/build-image.sh --name mon-projet --dockerfile ./mon/Dockerfile --push
+# Custom Dockerfile
+./images/build-image.sh --name my-project --dockerfile ./my/Dockerfile --push
 ```
 
-## Rôles utilisateurs
+## User roles
 
-| Rôle | Permissions |
+| Role | Permissions |
 |------|-------------|
-| **admin** | Gestion utilisateurs, images, webhooks, tous les environnements |
-| **user** | Ses environnements et ceux partagés avec lui |
+| **admin** | Users, images, webhooks, settings, all environments |
+| **user** | Own environments and those shared with them |
 
-## Fonctionnalités
+## Features
 
-- **Build d'images async** — lancement en arrière-plan avec journal et polling UI
-- **Édition d'environnements** — nom, CPU, RAM (recréation conteneur si nécessaire)
-- **Import Git** — clone automatique au démarrage si workspace vide
-- **Webhooks** — notifications HTTP signées (HMAC SHA-256) sur changements de statut
+- **Async image builds** — background builds with log streaming and UI polling
+- **Environment editing** — name, CPU, RAM (container recreated when resources change)
+- **Git import** — automatic clone on start if workspace is empty
+- **Webhooks** — HMAC SHA-256 signed HTTP notifications on status changes
+- **Zero-config install** — bootstrap HTTPS + web setup wizard
 
-## Persistance
+## Persistence
 
-Les volumes de workspace sont montés manuellement dans `/data/workspaces/{slug}`. Pensez à sauvegarder ce répertoire régulièrement.
+Workspace volumes are stored under `/data/workspaces/{slug}`. Back up this directory regularly.
 
 ### Maintenance
 
-Synchroniser les statuts Docker (cron recommandé toutes les minutes) :
+Sync Docker container statuses (recommended cron every minute):
 
 ```bash
 docker compose exec platform node ace dotg:sync-environments
 ```
 
-## Licence
+## Project structure
+
+```
+/
+├── install.sh                      VPS bootstrap
+├── docker-compose.yml              Production stack
+├── docker-compose.bootstrap.yml    Bootstrap overlay (HTTPS :8443)
+├── docker-compose.dev.yml          Local development overrides
+├── scripts/
+│   ├── lib/i18n.sh                 Shell script i18n library
+│   ├── lang/                       Script translations (en, fr, es, de, pt, it)
+│   ├── finish-setup.sh
+│   └── generate-bootstrap-certs.sh
+├── images/                         Environment Docker images
+└── platform/                       AdonisJS 7 admin application
+    └── resources/lang/             Web UI translations
+```
+
+## License
 
 MIT

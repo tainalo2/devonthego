@@ -1,28 +1,51 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Dev on the go — Bootstrap VPS
-# Usage: curl -fsSL .../install.sh | bash
+# Dev on the go — VPS bootstrap
+# Usage: curl -fsSL .../install.sh | sudo bash
 #    or: ./install.sh
 #
-# Par défaut : zero-config HTTPS autosigné (port 8443) + assistant web /setup
-#    ./install.sh --configure-cli  Configuration CLI (stack bootstrap déjà démarrée)
-#    ./install.sh --interactive    Configuration CLI avant tout démarrage web
-#    ./install.sh --non-interactive Conserve le .env existant
+# Default: zero-config self-signed HTTPS (port 8443) + web /setup wizard
+#    ./install.sh --configure-cli   CLI setup (bootstrap already running)
+#    ./install.sh --interactive       Full CLI before web start
+#    ./install.sh --non-interactive   Keep existing .env
+#
+# Language: DOTG_LANG=en|fr|es|de|pt|it (default: en)
 
 REPO_URL="${DOTG_REPO_URL:-https://github.com/tainalo2/devonthego.git}"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-INSTALL_DIR="${DOTG_INSTALL_DIR:-${SCRIPT_DIR}}"
+INSTALL_DIR="${DOTG_INSTALL_DIR:-/opt/devonthego}"
 INSTALL_MODE="bootstrap"
 NON_INTERACTIVE=false
 COMPOSE_FILES=(-f docker-compose.yml -f docker-compose.bootstrap.yml)
 BOOTSTRAP_PORT=8443
 
-log() { echo "[devonthego] $*"; }
-error() { echo "[devonthego] ERROR: $*" >&2; exit 1; }
+log() { log_msg "$@"; }
+error() { error_msg "$@"; }
+
+init_i18n() {
+  local lib=""
+  if [[ -f "${INSTALL_DIR}/scripts/lib/i18n.sh" ]]; then
+    lib="${INSTALL_DIR}/scripts/lib/i18n.sh"
+  elif [[ -f "${SCRIPT_DIR}/scripts/lib/i18n.sh" ]]; then
+    lib="${SCRIPT_DIR}/scripts/lib/i18n.sh"
+  fi
+
+  if [[ -z "${lib}" ]]; then
+    echo "[devonthego] ERROR: Translation files not found. Clone the repository first." >&2
+    exit 1
+  fi
+
+  # shellcheck source=/dev/null
+  source "${lib}"
+  dotg_i18n_init
+}
 
 require_root() {
-  [[ "${EUID}" -eq 0 ]] || error "Ce script doit être exécuté en root (sudo)."
+  [[ "${EUID}" -eq 0 ]] || {
+    echo "[devonthego] ERROR: This script must be run as root (sudo)." >&2
+    exit 1
+  }
 }
 
 parse_args() {
@@ -32,25 +55,49 @@ parse_args() {
       --configure-cli) INSTALL_MODE="configure-cli" ;;
       --non-interactive) NON_INTERACTIVE=true ;;
       -h|--help)
-        cat <<EOF
-Usage: install.sh [options]
-
-Options:
-  (défaut)            Zero-config : HTTPS autosigné sur :${BOOTSTRAP_PORT} + wizard web
-  --configure-cli     Configuration CLI (après démarrage bootstrap, sans navigateur)
-  --interactive       Configuration CLI complète avant déploiement (sans wizard web)
-  --non-interactive   Conserve le .env existant sans questions
-  -h, --help          Affiche cette aide
-
-Variables d'environnement:
-  DOTG_REPO_URL       URL du dépôt Git
-  DOTG_INSTALL_DIR    Répertoire d'installation (défaut: emplacement du script)
-EOF
+        if [[ -f "${SCRIPT_DIR}/scripts/lib/i18n.sh" ]]; then
+          # shellcheck source=/dev/null
+          source "${SCRIPT_DIR}/scripts/lib/i18n.sh"
+          dotg_i18n_init
+          print_help
+        elif [[ -f "${INSTALL_DIR}/scripts/lib/i18n.sh" ]]; then
+          # shellcheck source=/dev/null
+          source "${INSTALL_DIR}/scripts/lib/i18n.sh"
+          dotg_i18n_init
+          print_help
+        else
+          echo "Usage: install.sh [--configure-cli|--interactive|--non-interactive|-h]"
+        fi
         exit 0
         ;;
-      *) error "Option inconnue: ${arg}" ;;
+      *)
+        if declare -F error_msg >/dev/null 2>&1; then
+          error error.unknown_option "arg=${arg}"
+        else
+          echo "[devonthego] ERROR: Unknown option: ${arg}" >&2
+          exit 1
+        fi
+        ;;
     esac
   done
+}
+
+print_help() {
+  cat <<EOF
+$(t help.usage)
+
+Options:
+  $(t help.default port="${BOOTSTRAP_PORT}")
+  --configure-cli     $(t help.configure_cli)
+  --interactive       $(t help.interactive)
+  --non-interactive   $(t help.non_interactive)
+  -h, --help          $(t help.help_opt)
+
+Environment:
+  DOTG_REPO_URL       $(t help.env_repo)
+  DOTG_INSTALL_DIR    $(t help.env_install_dir)
+  DOTG_LANG           $(t help.env_lang)
+EOF
 }
 
 detect_os() {
@@ -60,14 +107,14 @@ detect_os() {
     OS_ID="${ID:-unknown}"
     OS_VERSION="${VERSION_ID:-unknown}"
   else
-    error "OS non supporté."
+    error error.unsupported_os
   fi
 
   case "${OS_ID}" in
     ubuntu|debian) ;;
-    *) error "OS non supporté: ${OS_ID}. Utilisez Ubuntu 22.04+ ou Debian 12+." ;;
+    *) error error.unsupported_os_detail "os=${OS_ID}" ;;
   esac
-  log "OS détecté: ${OS_ID} ${OS_VERSION}"
+  log log.os_detected "os=${OS_ID}" "version=${OS_VERSION}"
 }
 
 detect_public_ip() {
@@ -82,11 +129,11 @@ detect_public_ip() {
 
 install_docker() {
   if command -v docker >/dev/null 2>&1; then
-    log "Docker déjà installé: $(docker --version)"
+    log log.docker_installed "version=$(docker --version)"
     return
   fi
 
-  log "Installation de Docker..."
+  log log.installing_docker
   curl -fsSL https://get.docker.com | sh
   systemctl enable docker
   systemctl start docker
@@ -94,11 +141,11 @@ install_docker() {
 
 configure_firewall() {
   if ! command -v ufw >/dev/null 2>&1; then
-    log "UFW non disponible, configuration firewall ignorée."
+    log log.ufw_unavailable
     return
   fi
 
-  log "Configuration du firewall (ports 22, 80, 443, ${BOOTSTRAP_PORT})..."
+  log log.configuring_firewall "port=${BOOTSTRAP_PORT}"
   ufw allow 22/tcp
   ufw allow 80/tcp
   ufw allow 443/tcp
@@ -170,16 +217,15 @@ write_env_file() {
 
 generate_bootstrap_certs() {
   local server_ip="$1"
-  local cert_dir="${INSTALL_DIR}/certs/bootstrap"
   local gen_script="${INSTALL_DIR}/scripts/generate-bootstrap-certs.sh"
 
   [[ -x "${gen_script}" ]] || chmod +x "${gen_script}"
-  "${gen_script}" "${cert_dir}" "${server_ip}"
+  "${gen_script}" "${INSTALL_DIR}/certs/bootstrap" "${server_ip}"
 }
 
 generate_bootstrap_env() {
   if [[ -f "${INSTALL_DIR}/.env" && "${NON_INTERACTIVE}" == "true" ]]; then
-    log "Mode non-interactif : .env conservé tel quel."
+    log log.non_interactive_env
     return
   fi
 
@@ -187,7 +233,7 @@ generate_bootstrap_env() {
     local completed
     completed="$(read_env_value BOOTSTRAP_MODE "${INSTALL_DIR}/.env")"
     if [[ "${completed}" == "false" ]]; then
-      log "Configuration production déjà présente — .env conservé."
+      log log.production_env_kept
       COMPOSE_FILES=(-f docker-compose.yml)
       INSTALL_MODE="production"
       return
@@ -221,36 +267,36 @@ generate_bootstrap_env() {
   chmod +x "${INSTALL_DIR}/scripts/finish-setup.sh" 2>/dev/null || true
   chmod +x "${INSTALL_DIR}/scripts/generate-bootstrap-certs.sh" 2>/dev/null || true
 
-  log "Configuration bootstrap générée (${INSTALL_DIR}/.env)"
+  log log.bootstrap_env_generated "path=${INSTALL_DIR}"
   export BOOTSTRAP_SUMMARY_IP="${server_ip}"
   export BOOTSTRAP_SUMMARY_PASSWORD="${bootstrap_password}"
 }
 
 confirm_or_prompt() {
   local var_name="$1"
-  local label="$2"
+  local label_key="$2"
   local current="$3"
   local is_secret="${4:-false}"
   local allow_empty="${5:-false}"
 
   if [[ "${NON_INTERACTIVE}" == "true" ]]; then
     if [[ -z "${current}" && "${allow_empty}" != "true" ]]; then
-      error "Variable ${var_name} manquante en mode non-interactif."
+      error error.missing_var "var=${var_name}"
     fi
     printf -v "${var_name}" '%s' "${current}"
     return
   fi
 
   echo ""
-  echo "── ${label} (${var_name}) ──"
+  echo "── $(t "${label_key}") (${var_name}) ──"
   if [[ -n "${current}" ]]; then
     if [[ "${is_secret}" == "true" ]]; then
-      echo "Valeur actuelle : ********"
+      echo "$(t prompt.current_value_secret)"
     else
-      echo "Valeur actuelle : ${current}"
+      echo "$(t prompt.current_value value="${current}")"
     fi
     local confirm
-    read -rp "Conserver cette valeur ? [O/n] " confirm
+    read -rp "$(t prompt.keep_value) " confirm
     if [[ ! "${confirm}" =~ ^[Nn]$ ]]; then
       printf -v "${var_name}" '%s' "${current}"
       return
@@ -259,14 +305,14 @@ confirm_or_prompt() {
 
   local new_value
   if [[ "${is_secret}" == "true" ]]; then
-    read -rsp "Nouvelle valeur : " new_value
+    read -rsp "$(t prompt.new_value_secret) " new_value
     echo
   else
-    read -rp "Nouvelle valeur : " new_value
+    read -rp "$(t prompt.new_value) " new_value
   fi
 
   while [[ -z "${new_value}" && "${allow_empty}" != "true" ]]; do
-    read -rp "La valeur ne peut pas être vide. Nouvelle valeur : " new_value
+    read -rp "$(t prompt.cannot_empty) " new_value
   done
 
   printf -v "${var_name}" '%s' "${new_value}"
@@ -274,7 +320,7 @@ confirm_or_prompt() {
 
 confirm_or_prompt_bool() {
   local var_name="$1"
-  local label="$2"
+  local label_key="$2"
   local current="$3"
 
   if [[ "${NON_INTERACTIVE}" == "true" ]]; then
@@ -283,10 +329,10 @@ confirm_or_prompt_bool() {
   fi
 
   echo ""
-  echo "── ${label} (${var_name}) ──"
-  echo "Valeur actuelle : ${current}"
+  echo "── $(t "${label_key}") (${var_name}) ──"
+  echo "$(t prompt.current_value value="${current}")"
   local confirm
-  read -rp "Conserver cette valeur ? [O/n] " confirm
+  read -rp "$(t prompt.keep_value) " confirm
   if [[ ! "${confirm}" =~ ^[Nn]$ ]]; then
     printf -v "${var_name}" '%s' "${current}"
     return
@@ -294,11 +340,11 @@ confirm_or_prompt_bool() {
 
   local answer
   while true; do
-    read -rp "Activer ? [o/N] : " answer
+    read -rp "$(t prompt.enable_bool) " answer
     case "${answer,,}" in
-      true|t|o|oui|y|yes|1) printf -v "${var_name}" '%s' "true"; return ;;
+      true|t|o|oui|y|yes|1|j|ja|s|si) printf -v "${var_name}" '%s' "true"; return ;;
       false|f|n|non|''|0) printf -v "${var_name}" '%s' "false"; return ;;
-      *) echo "Répondez par true ou false." ;;
+      *) echo "$(t prompt.answer_true_false)" ;;
     esac
   done
 }
@@ -316,7 +362,7 @@ prompt_env_interactive() {
 
   echo ""
   echo "╔══════════════════════════════════════════════════════════════╗"
-  echo "║     Configuration Dev on the go (mode CLI)                  ║"
+  printf "║  %-59s  ║\n" "$(t prompt.cli_header)"
   echo "╚══════════════════════════════════════════════════════════════╝"
 
   # shellcheck disable=SC2034
@@ -343,11 +389,11 @@ prompt_env_interactive() {
   ENV_CPU_LIMIT="${ENV_CPU_LIMIT:-1}"
   ENV_MEMORY_LIMIT="${ENV_MEMORY_LIMIT:-1024m}"
 
-  confirm_or_prompt DOMAIN "Domaine principal" "${DOMAIN}"
-  confirm_or_prompt ACME_EMAIL "Email Let's Encrypt" "${ACME_EMAIL}"
-  confirm_or_prompt ADMIN_EMAIL "Email administrateur" "${ADMIN_EMAIL}"
-  confirm_or_prompt ADMIN_FULL_NAME "Nom administrateur" "${ADMIN_FULL_NAME}" false true
-  confirm_or_prompt ADMIN_PASSWORD "Mot de passe admin" "${ADMIN_PASSWORD}" true true
+  confirm_or_prompt DOMAIN label.domain "${DOMAIN}"
+  confirm_or_prompt ACME_EMAIL label.acme_email "${ACME_EMAIL}"
+  confirm_or_prompt ADMIN_EMAIL label.admin_email "${ADMIN_EMAIL}"
+  confirm_or_prompt ADMIN_FULL_NAME label.admin_name "${ADMIN_FULL_NAME}" false true
+  confirm_or_prompt ADMIN_PASSWORD label.admin_password "${ADMIN_PASSWORD}" true true
   if [[ -z "${ADMIN_PASSWORD}" ]]; then
     ADMIN_PASSWORD="$(openssl rand -base64 16)"
   fi
@@ -356,10 +402,10 @@ prompt_env_interactive() {
   if [[ -z "${APP_URL}" || "${APP_URL}" == *"example.com"* || "${APP_URL}" == *":8443"* ]]; then
     APP_URL="${default_app_url}"
   fi
-  confirm_or_prompt APP_URL "URL interface admin" "${APP_URL}"
-  confirm_or_prompt_bool ALLOW_PUBLIC_SIGNUP "Inscription publique" "${ALLOW_PUBLIC_SIGNUP}"
-  confirm_or_prompt ENV_CPU_LIMIT "CPU par environnement" "${ENV_CPU_LIMIT}"
-  confirm_or_prompt ENV_MEMORY_LIMIT "RAM par environnement" "${ENV_MEMORY_LIMIT}"
+  confirm_or_prompt APP_URL label.app_url "${APP_URL}"
+  confirm_or_prompt_bool ALLOW_PUBLIC_SIGNUP label.public_signup "${ALLOW_PUBLIC_SIGNUP}"
+  confirm_or_prompt ENV_CPU_LIMIT label.env_cpu "${ENV_CPU_LIMIT}"
+  confirm_or_prompt ENV_MEMORY_LIMIT label.env_memory "${ENV_MEMORY_LIMIT}"
 
   if [[ -z "${APP_KEY}" ]]; then
     APP_KEY="$(openssl rand -base64 32)"
@@ -367,7 +413,7 @@ prompt_env_interactive() {
 
   write_env_file
   COMPOSE_FILES=(-f docker-compose.yml)
-  log "Configuration sauvegardée dans ${INSTALL_DIR}/.env"
+  log log.config_saved "path=${INSTALL_DIR}"
 }
 
 configure_env() {
@@ -380,42 +426,43 @@ configure_env() {
 
 clone_or_update() {
   if [[ -d "${INSTALL_DIR}/.git" ]]; then
-    log "Mise à jour du dépôt..."
+    log log.updating_repo
     git -C "${INSTALL_DIR}" pull --ff-only
   else
-    log "Clonage du dépôt dans ${INSTALL_DIR}..."
+    log log.cloning_repo "dir=${INSTALL_DIR}"
+    mkdir -p "${INSTALL_DIR}"
     git clone "${REPO_URL}" "${INSTALL_DIR}"
   fi
 }
 
 build_images() {
-  log "Construction de l'image de base..."
+  log log.building_base
   docker build -t devonthego/base:latest -f "${INSTALL_DIR}/images/base/Dockerfile" "${INSTALL_DIR}/images/base"
 
-  log "Construction des templates..."
+  log log.building_templates
   for template in node python php; do
-    "${INSTALL_DIR}/images/build-image.sh" --template "${template}" --name "${template}" || true
+    DOTG_LANG="${DOTG_LOCALE:-en}" "${INSTALL_DIR}/images/build-image.sh" --template "${template}" --name "${template}" || true
   done
 }
 
 start_stack() {
-  log "Démarrage de la stack..."
+  log log.starting_stack
   cd "${INSTALL_DIR}"
   export DOTG_INSTALL_DIR="${INSTALL_DIR}"
   docker compose "${COMPOSE_FILES[@]}" pull
   docker compose "${COMPOSE_FILES[@]}" build platform
   docker compose "${COMPOSE_FILES[@]}" up -d
 
-  log "Attente du démarrage de la plateforme..."
+  log log.waiting_platform
   sleep 15
 }
 
 apply_cli_configuration() {
-  [[ -f "${INSTALL_DIR}/.env" ]] || error "Aucune installation dans ${INSTALL_DIR}"
+  [[ -f "${INSTALL_DIR}/.env" ]] || error error.no_installation "dir=${INSTALL_DIR}"
 
   local bootstrap_mode
   bootstrap_mode="$(read_env_value BOOTSTRAP_MODE "${INSTALL_DIR}/.env")"
-  [[ "${bootstrap_mode}" == "true" ]] || error "Configuration déjà terminée (BOOTSTRAP_MODE=false)."
+  [[ "${bootstrap_mode}" == "true" ]] || error error.already_configured
 
   COMPOSE_FILES=(-f docker-compose.yml -f docker-compose.bootstrap.yml)
   prompt_env_interactive
@@ -423,13 +470,13 @@ apply_cli_configuration() {
   cd "${INSTALL_DIR}"
   export DOTG_INSTALL_DIR="${INSTALL_DIR}"
 
-  log "Enregistrement de la configuration dans la base..."
+  log log.saving_config_db
   docker compose "${COMPOSE_FILES[@]}" exec -T platform node build/ace.js dotg:complete-setup-cli
 
-  log "Basculage vers le mode production HTTPS..."
+  log log.switching_production
   bash "${INSTALL_DIR}/scripts/finish-setup.sh" "${INSTALL_DIR}"
 
-  log "Attente du redémarrage..."
+  log log.waiting_restart
   sleep 20
 
   INSTALL_MODE="production"
@@ -442,14 +489,14 @@ offer_cli_configuration() {
 
   echo ""
   echo "──────────────────────────────────────────────────────────────"
-  echo "Le portail web est démarré. Configuration possible :"
-  echo "  • Navigateur : https://<IP>:${BOOTSTRAP_PORT} (certificat autosigné)"
-  echo "  • SSH plus tard : ${INSTALL_DIR}/install.sh --configure-cli"
+  echo "$(t prompt.cli_options_header)"
+  echo "  • $(t prompt.cli_option_browser port="${BOOTSTRAP_PORT}")"
+  echo "  • $(t prompt.cli_option_ssh dir="${INSTALL_DIR}")"
   echo "──────────────────────────────────────────────────────────────"
 
   local answer
-  read -rp "Configurer maintenant en CLI (sans navigateur) ? [o/N] " answer
-  if [[ "${answer,,}" =~ ^(o|oui|y|yes)$ ]]; then
+  read -rp "$(t prompt.cli_configure_now) " answer
+  if [[ "${answer,,}" =~ ^(o|oui|y|yes|s|si|j|ja)$ ]]; then
     apply_cli_configuration
   fi
 }
@@ -465,17 +512,17 @@ print_summary_bootstrap() {
   cat <<EOF
 
 ╔══════════════════════════════════════════════════════════════╗
-║        Dev on the go — Installation bootstrap terminée       ║
+║  $(t summary.bootstrap.title)
 ╠══════════════════════════════════════════════════════════════╣
-║  1. Ouvrez :  https://${ip}:${BOOTSTRAP_PORT}
-║     (certificat autosigné — acceptez l'avertissement navigateur)
-║  2. Connectez-vous :
-║       Email           admin@bootstrap.local
-║       Mot de passe    ${password}
-║  3. Suivez l'assistant /setup
+║  $(t summary.bootstrap.step1 ip="${ip}" port="${BOOTSTRAP_PORT}")
+║  $(t summary.bootstrap.step1_hint)
+║  $(t summary.bootstrap.step2)
+║  $(t summary.bootstrap.email)
+║  $(t summary.bootstrap.password password="${password}")
+║  $(t summary.bootstrap.step3)
 ╠══════════════════════════════════════════════════════════════╣
-║  Sans navigateur : ${INSTALL_DIR}/install.sh --configure-cli
-║  Après configuration : https://admin.<votre-domaine>
+║  $(t summary.bootstrap.cli dir="${INSTALL_DIR}")
+║  $(t summary.bootstrap.after)
 ╚══════════════════════════════════════════════════════════════╝
 EOF
 }
@@ -486,11 +533,11 @@ print_summary_production() {
   cat <<EOF
 
 ╔══════════════════════════════════════════════════════════════╗
-║           Dev on the go — Installation terminée              ║
+║  $(t summary.production.title)
 ╠══════════════════════════════════════════════════════════════╣
-║  Admin:     ${APP_URL}
-║  Email:     ${ADMIN_EMAIL}
-║  Password:  ${ADMIN_PASSWORD}
+║  $(t summary.production.admin url="${APP_URL}")
+║  $(t summary.production.email email="${ADMIN_EMAIL}")
+║  $(t summary.production.password password="${ADMIN_PASSWORD}")
 ╚══════════════════════════════════════════════════════════════╝
 EOF
 }
@@ -508,14 +555,17 @@ main() {
   require_root
 
   if [[ "${INSTALL_MODE}" == "configure-cli" ]]; then
+    init_i18n
     apply_cli_configuration
     exit 0
   fi
 
+  clone_or_update
+  init_i18n
+
   detect_os
   install_docker
   configure_firewall
-  clone_or_update
   configure_env
   build_images
   start_stack
