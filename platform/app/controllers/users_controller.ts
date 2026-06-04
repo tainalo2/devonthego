@@ -22,13 +22,13 @@ export default class UsersController {
     return inertia.render('users/create', {})
   }
 
-  async store({ request, response, session }: HttpContext) {
+  async store({ request, response, session, i18n }: HttpContext) {
     const payload = await request.validateUsing(createUserValidator)
     await User.create({
       ...payload,
       isActive: payload.isActive ?? true,
     })
-    session.flash('success', 'Utilisateur créé.')
+    session.flash('success', i18n.t('flash.users.created'))
     return response.redirect().toRoute('users.index')
   }
 
@@ -45,7 +45,7 @@ export default class UsersController {
     })
   }
 
-  async update({ request, response, params, session }: HttpContext) {
+  async update({ request, response, params, session, i18n }: HttpContext) {
     const user = await User.findOrFail(params.id)
     const payload = await request.validateUsing(updateUserValidator, {
       meta: { userId: user.id },
@@ -64,20 +64,20 @@ export default class UsersController {
 
     await user.save()
 
-    session.flash('success', 'Utilisateur mis à jour.')
+    session.flash('success', i18n.t('flash.users.updated'))
     return response.redirect().toRoute('users.index')
   }
 
-  async destroy({ params, response, session, auth }: HttpContext) {
+  async destroy({ params, response, session, auth, i18n }: HttpContext) {
     const user = await User.findOrFail(params.id)
 
     if (auth.user!.id === user.id) {
-      session.flash('error', 'Vous ne pouvez pas supprimer votre propre compte.')
+      session.flash('error', i18n.t('flash.users.cannot_delete_self'))
       return response.redirect().toRoute('users.index')
     }
 
     await user.delete()
-    session.flash('success', 'Utilisateur supprimé.')
+    session.flash('success', i18n.t('flash.users.deleted'))
     return response.redirect().toRoute('users.index')
   }
 }

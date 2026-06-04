@@ -1,5 +1,6 @@
 import AppLayout from '~/layouts/app'
 import { Link } from '@adonisjs/inertia/react'
+import { useI18n } from '~/hooks/use_i18n'
 
 type EnvironmentItem = {
   id: number
@@ -20,28 +21,30 @@ type Props = {
 }
 
 export default function EnvironmentsIndex({ environments }: Props) {
+  const { t, statusLabel } = useI18n()
+
   return (
     <AppLayout>
       <div className="page">
         <div className="page-header">
-          <h1>Environnements</h1>
+          <h1>{t('messages.environments.title')}</h1>
           <Link route="environments.create" className="btn btn-primary">
-            Nouvel environnement
+            {t('messages.environments.new')}
           </Link>
         </div>
 
         <section className="card">
           {environments.length === 0 ? (
-            <p className="muted">Aucun environnement.</p>
+            <p className="muted">{t('messages.environments.none')}</p>
           ) : (
             <table className="table">
               <thead>
                 <tr>
-                  <th>Nom</th>
-                  <th>Statut</th>
-                  <th>Image</th>
-                  <th>Propriétaire</th>
-                  <th>Ressources</th>
+                  <th>{t('messages.environments.columns.name')}</th>
+                  <th>{t('messages.environments.columns.status')}</th>
+                  <th>{t('messages.environments.columns.image')}</th>
+                  <th>{t('messages.environments.columns.owner')}</th>
+                  <th>{t('messages.environments.columns.resources')}</th>
                   <th></th>
                 </tr>
               </thead>
@@ -50,16 +53,16 @@ export default function EnvironmentsIndex({ environments }: Props) {
                   <tr key={env.id}>
                     <td>{env.name}</td>
                     <td>
-                      <span className={`badge badge-${env.status}`}>{env.status}</span>
+                      <span className={`badge badge-${env.status}`}>{statusLabel(env.status)}</span>
                     </td>
-                    <td>{env.imageTemplate?.name ?? 'Custom'}</td>
+                    <td>{env.imageTemplate?.name ?? t('messages.common.custom')}</td>
                     <td>{env.owner.email}</td>
                     <td>
-                      {env.cpuLimit} CPU / {env.memoryLimitMb} Mo
+                      {env.cpuLimit} CPU / {env.memoryLimitMb} MB
                     </td>
                     <td>
                       <Link route="environments.show" routeParams={{ id: env.id }}>
-                        Ouvrir
+                        {t('messages.common.open')}
                       </Link>
                     </td>
                   </tr>

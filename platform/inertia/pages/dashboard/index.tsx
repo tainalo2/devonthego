@@ -1,5 +1,6 @@
 import AppLayout from '~/layouts/app'
 import { Link } from '@adonisjs/inertia/react'
+import { useI18n } from '~/hooks/use_i18n'
 
 type EnvironmentItem = {
   id: number
@@ -32,49 +33,51 @@ function statusClass(status: string) {
 }
 
 export default function Dashboard({ environments, stats }: Props) {
+  const { t, statusLabel } = useI18n()
+
   return (
     <AppLayout>
       <div className="page">
         <div className="page-header">
-          <h1>Tableau de bord</h1>
+          <h1>{t('messages.dashboard.title')}</h1>
           <Link route="environments.create" className="btn btn-primary">
-            Nouvel environnement
+            {t('messages.dashboard.newEnvironment')}
           </Link>
         </div>
 
         <div className="stats-grid">
           <div className="stat-card">
-            <span className="stat-label">Environnements</span>
+            <span className="stat-label">{t('messages.dashboard.stats.environments')}</span>
             <strong>{stats.environmentsTotal}</strong>
           </div>
           <div className="stat-card">
-            <span className="stat-label">En cours</span>
+            <span className="stat-label">{t('messages.dashboard.stats.running')}</span>
             <strong>{stats.environmentsRunning}</strong>
           </div>
           <div className="stat-card">
-            <span className="stat-label">Utilisateurs</span>
+            <span className="stat-label">{t('messages.dashboard.stats.users')}</span>
             <strong>{stats.usersTotal}</strong>
           </div>
           <div className="stat-card">
-            <span className="stat-label">Docker</span>
+            <span className="stat-label">{t('messages.dashboard.stats.docker')}</span>
             <strong className={stats.dockerOnline ? 'text-success' : 'text-error'}>
-              {stats.dockerOnline ? 'En ligne' : 'Hors ligne'}
+              {stats.dockerOnline ? t('messages.common.online') : t('messages.common.offline')}
             </strong>
           </div>
         </div>
 
         <section className="card">
-          <h2>Environnements récents</h2>
+          <h2>{t('messages.dashboard.recentEnvironments')}</h2>
           {environments.length === 0 ? (
-            <p className="muted">Aucun environnement pour le moment.</p>
+            <p className="muted">{t('messages.dashboard.noEnvironments')}</p>
           ) : (
             <table className="table">
               <thead>
                 <tr>
-                  <th>Nom</th>
-                  <th>Statut</th>
-                  <th>URL</th>
-                  <th>Propriétaire</th>
+                  <th>{t('messages.dashboard.columns.name')}</th>
+                  <th>{t('messages.dashboard.columns.status')}</th>
+                  <th>{t('messages.dashboard.columns.url')}</th>
+                  <th>{t('messages.dashboard.columns.owner')}</th>
                   <th></th>
                 </tr>
               </thead>
@@ -83,7 +86,7 @@ export default function Dashboard({ environments, stats }: Props) {
                   <tr key={env.id}>
                     <td>{env.name}</td>
                     <td>
-                      <span className={statusClass(env.status)}>{env.status}</span>
+                      <span className={statusClass(env.status)}>{statusLabel(env.status)}</span>
                     </td>
                     <td>
                       <a href={env.url} target="_blank" rel="noreferrer">
@@ -93,7 +96,7 @@ export default function Dashboard({ environments, stats }: Props) {
                     <td>{env.owner?.email}</td>
                     <td>
                       <Link route="environments.show" routeParams={{ id: env.id }}>
-                        Détails
+                        {t('messages.common.details')}
                       </Link>
                     </td>
                   </tr>

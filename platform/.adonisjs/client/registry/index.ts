@@ -48,6 +48,12 @@ const routes = {
     tokens: [{"old":"/setup","type":0,"val":"setup","end":""}],
     types: placeholder as Registry['setup.store']['types'],
   },
+  'locale.update': {
+    methods: ["POST"],
+    pattern: '/locale',
+    tokens: [{"old":"/locale","type":0,"val":"locale","end":""}],
+    types: placeholder as Registry['locale.update']['types'],
+  },
   'session.destroy': {
     methods: ["POST"],
     pattern: '/logout',

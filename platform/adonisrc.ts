@@ -58,6 +58,7 @@ export default defineConfig({
     () => import('@adonisjs/cors/cors_provider'),
     () => import('@adonisjs/inertia/inertia_provider'),
     () => import('@adonisjs/auth/auth_provider'),
+    () => import('@adonisjs/i18n/i18n_provider'),
     () => import('#providers/api_provider'),
     () => import('#providers/sync_provider'),
   ],
@@ -122,6 +123,10 @@ export default defineConfig({
     },
     {
       pattern: 'public/**',
+      reloadServer: false,
+    },
+    {
+      pattern: 'resources/lang/**',
       reloadServer: false,
     },
   ],

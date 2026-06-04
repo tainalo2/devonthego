@@ -1,5 +1,6 @@
 import AppLayout from '~/layouts/app'
 import { Form, Link } from '@adonisjs/inertia/react'
+import { useI18n } from '~/hooks/use_i18n'
 
 type Template = {
   id: number
@@ -25,12 +26,14 @@ type Props = {
 }
 
 export default function EnvironmentsCreate({ templates, users, defaults }: Props) {
+  const { t, buildStatusLabel, roleLabel } = useI18n()
+
   return (
     <AppLayout>
       <div className="page">
         <div className="page-header">
-          <h1>Nouvel environnement</h1>
-          <Link route="environments.index">Retour</Link>
+          <h1>{t('messages.environments.createTitle')}</h1>
+          <Link route="environments.index">{t('messages.common.back')}</Link>
         </div>
 
         <section className="card form-card">
@@ -38,19 +41,19 @@ export default function EnvironmentsCreate({ templates, users, defaults }: Props
             {({ errors }) => (
               <>
                 <label>
-                  Nom
+                  {t('messages.common.name')}
                   <input type="text" name="name" required />
                   {errors.name && <span className="error">{errors.name}</span>}
                 </label>
 
                 <label>
-                  Template d&apos;image
-                  <select name="imageTemplateId" defaultValue={templates.find((t) => t.isDefault)?.id}>
+                  {t('messages.environments.form.imageTemplate')}
+                  <select name="imageTemplateId" defaultValue={templates.find((tpl) => tpl.isDefault)?.id}>
                     {templates.map((template) => (
                       <option key={template.id} value={template.id}>
                         {template.name}
                         {template.buildStatus !== 'success' && template.buildStatus !== 'idle'
-                          ? ` (${template.buildStatus})`
+                          ? ` (${buildStatusLabel(template.buildStatus)})`
                           : ''}
                       </option>
                     ))}
@@ -60,19 +63,19 @@ export default function EnvironmentsCreate({ templates, users, defaults }: Props
                 {users.length > 0 && (
                   <>
                     <label>
-                      Propriétaire
+                      {t('messages.environments.form.owner')}
                       <select name="ownerId" defaultValue="">
-                        <option value="">Moi-même</option>
+                        <option value="">{t('messages.common.myself')}</option>
                         {users.map((user) => (
                           <option key={user.id} value={user.id}>
-                            {user.email} ({user.role})
+                            {user.email} ({roleLabel(user.role)})
                           </option>
                         ))}
                       </select>
                     </label>
 
                     <fieldset className="checkbox-group">
-                      <legend>Utilisateurs assignés (accès partagé)</legend>
+                      <legend>{t('messages.environments.form.assignedUsers')}</legend>
                       {users.map((user) => (
                         <label key={user.id} className="checkbox">
                           <input type="checkbox" name="assignedUserIds[]" value={user.id} />
@@ -85,7 +88,7 @@ export default function EnvironmentsCreate({ templates, users, defaults }: Props
 
                 <div className="form-row">
                   <label>
-                    CPU (cores)
+                    {t('messages.environments.form.cpu')}
                     <input
                       type="number"
                       name="cpuLimit"
@@ -95,7 +98,7 @@ export default function EnvironmentsCreate({ templates, users, defaults }: Props
                     />
                   </label>
                   <label>
-                    RAM (Mo)
+                    {t('messages.environments.form.ram')}
                     <input
                       type="number"
                       name="memoryLimitMb"
@@ -107,27 +110,25 @@ export default function EnvironmentsCreate({ templates, users, defaults }: Props
                 </div>
 
                 <fieldset className="checkbox-group">
-                  <legend>Import Git (optionnel)</legend>
+                  <legend>{t('messages.environments.form.gitImport')}</legend>
                   <label>
-                    URL du dépôt
+                    {t('messages.environments.form.gitRepoUrl')}
                     <input
                       type="url"
                       name="gitRepoUrl"
-                      placeholder="https://github.com/user/mon-projet.git"
+                      placeholder="https://github.com/user/my-project.git"
                     />
                     {errors.gitRepoUrl && <span className="error">{errors.gitRepoUrl}</span>}
                   </label>
                   <label>
-                    Branche
+                    {t('messages.environments.form.gitBranch')}
                     <input type="text" name="gitBranch" placeholder="main" />
                   </label>
-                  <p className="muted small">
-                    Le dépôt sera cloné dans le workspace au premier démarrage (si vide).
-                  </p>
+                  <p className="muted small">{t('messages.environments.form.gitHint')}</p>
                 </fieldset>
 
                 <button type="submit" className="btn btn-primary">
-                  Créer l&apos;environnement
+                  {t('messages.environments.form.submitCreate')}
                 </button>
               </>
             )}

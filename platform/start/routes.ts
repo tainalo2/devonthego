@@ -34,6 +34,8 @@ router
   })
   .use(middleware.guest())
 
+router.post('locale', [controllers.Locale, 'update']).as('locale.update')
+
 router
   .group(() => {
     router.get('setup', [controllers.Setup, 'index']).as('setup.index')

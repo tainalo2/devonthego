@@ -1,5 +1,6 @@
 import AppLayout from '~/layouts/app'
 import { Form, Link } from '@adonisjs/inertia/react'
+import { useI18n } from '~/hooks/use_i18n'
 
 type Environment = {
   id: number
@@ -52,6 +53,8 @@ export default function EnvironmentShow({
   canManage,
   availableUsers,
 }: Props) {
+  const { t, statusLabel } = useI18n()
+
   return (
     <AppLayout>
       <div className="page">
@@ -63,25 +66,27 @@ export default function EnvironmentShow({
           <div className="actions-row">
             {canManage && (
               <Link route="environments.edit" routeParams={{ id: environment.id }} className="btn">
-                Modifier
+                {t('messages.common.edit')}
               </Link>
             )}
-            <Link route="environments.index">Retour</Link>
+            <Link route="environments.index">{t('messages.common.back')}</Link>
           </div>
         </div>
 
         <div className="detail-grid">
           <section className="card">
-            <h2>Informations</h2>
+            <h2>{t('messages.environments.show.info')}</h2>
             <dl className="detail-list">
               <div>
-                <dt>Statut</dt>
+                <dt>{t('messages.common.status')}</dt>
                 <dd>
-                  <span className={`badge badge-${environment.status}`}>{environment.status}</span>
+                  <span className={`badge badge-${environment.status}`}>
+                    {statusLabel(environment.status)}
+                  </span>
                 </dd>
               </div>
               <div>
-                <dt>URL</dt>
+                <dt>{t('messages.common.url')}</dt>
                 <dd>
                   <a href={environment.url} target="_blank" rel="noreferrer">
                     {environment.url}
@@ -89,20 +94,20 @@ export default function EnvironmentShow({
                 </dd>
               </div>
               <div>
-                <dt>Image Docker</dt>
+                <dt>{t('messages.environments.show.dockerImage')}</dt>
                 <dd>
                   <code>{environment.dockerImage}</code>
                 </dd>
               </div>
               <div>
-                <dt>Propriétaire</dt>
+                <dt>{t('messages.common.owner')}</dt>
                 <dd>{environment.owner.email}</dd>
               </div>
               <div>
-                <dt>Utilisateurs assignés</dt>
+                <dt>{t('messages.environments.show.assignedUsers')}</dt>
                 <dd>
                   {environment.assignedUsers.length === 0 ? (
-                    <span className="muted">Aucun</span>
+                    <span className="muted">{t('messages.common.none')}</span>
                   ) : (
                     environment.assignedUsers.map((u) => u.email).join(', ')
                   )}
@@ -110,7 +115,7 @@ export default function EnvironmentShow({
               </div>
               {(environment.gitRepoUrl || environment.gitBranch) && (
                 <div>
-                  <dt>Git</dt>
+                  <dt>{t('messages.environments.show.git')}</dt>
                   <dd>
                     {environment.gitRepoUrl && (
                       <div>
@@ -118,20 +123,22 @@ export default function EnvironmentShow({
                       </div>
                     )}
                     {environment.gitBranch && (
-                      <span className="muted">branche : {environment.gitBranch}</span>
+                      <span className="muted">
+                        {t('messages.environments.show.branchPrefix')} {environment.gitBranch}
+                      </span>
                     )}
                   </dd>
                 </div>
               )}
               <div>
-                <dt>Ressources</dt>
+                <dt>{t('messages.common.resources')}</dt>
                 <dd>
-                  {environment.cpuLimit} CPU / {environment.memoryLimitMb} Mo
+                  {environment.cpuLimit} CPU / {environment.memoryLimitMb} MB
                 </dd>
               </div>
               {environment.errorMessage && (
                 <div>
-                  <dt>Erreur</dt>
+                  <dt>{t('messages.common.error')}</dt>
                   <dd className="text-error">{environment.errorMessage}</dd>
                 </div>
               )}
@@ -141,22 +148,22 @@ export default function EnvironmentShow({
               <div className="actions-row">
                 <Form route="environments.start" routeParams={{ id: environment.id }}>
                   <button type="submit" className="btn">
-                    Démarrer
+                    {t('messages.environments.show.start')}
                   </button>
                 </Form>
                 <Form route="environments.stop" routeParams={{ id: environment.id }}>
                   <button type="submit" className="btn">
-                    Arrêter
+                    {t('messages.environments.show.stop')}
                   </button>
                 </Form>
                 <Form route="environments.regenerateCredentials" routeParams={{ id: environment.id }}>
                   <button type="submit" className="btn">
-                    Régénérer identifiants
+                    {t('messages.environments.show.regenerateCredentials')}
                   </button>
                 </Form>
                 <Form route="environments.destroy" routeParams={{ id: environment.id }}>
                   <button type="submit" className="btn btn-danger">
-                    Supprimer
+                    {t('messages.common.delete')}
                   </button>
                 </Form>
               </div>
@@ -164,33 +171,31 @@ export default function EnvironmentShow({
           </section>
 
           <section className="card">
-            <h2>Authentification (Basic Auth)</h2>
+            <h2>{t('messages.environments.show.auth')}</h2>
             {credentials ? (
               <dl className="detail-list">
                 <div>
-                  <dt>Utilisateur</dt>
+                  <dt>{t('messages.environments.show.username')}</dt>
                   <dd>
                     <code>{credentials.username}</code>
                   </dd>
                 </div>
                 <div>
-                  <dt>Mot de passe</dt>
+                  <dt>{t('messages.common.password')}</dt>
                   <dd>
                     <code>{credentials.password}</code>
                   </dd>
                 </div>
               </dl>
             ) : (
-              <p className="muted">
-                Les identifiants ne sont affichés qu&apos;à la création ou après régénération.
-              </p>
+              <p className="muted">{t('messages.environments.show.credentialsHint')}</p>
             )}
           </section>
         </div>
 
         {canManage && availableUsers.length > 0 && (
           <section className="card form-card">
-            <h2>Assigner des utilisateurs</h2>
+            <h2>{t('messages.environments.show.assignUsers')}</h2>
             <Form route="environments.assignUsers" routeParams={{ id: environment.id }} className="form">
               <fieldset className="checkbox-group">
                 {availableUsers.map((user) => (
@@ -206,16 +211,16 @@ export default function EnvironmentShow({
                 ))}
               </fieldset>
               <button type="submit" className="btn btn-primary">
-                Enregistrer les assignations
+                {t('messages.environments.show.saveAssignments')}
               </button>
             </Form>
           </section>
         )}
 
         <section className="card">
-          <h2>Journal plateforme</h2>
+          <h2>{t('messages.environments.show.platformLog')}</h2>
           {logs.length === 0 ? (
-            <p className="muted">Aucun événement.</p>
+            <p className="muted">{t('messages.environments.show.noEvents')}</p>
           ) : (
             <ul className="log-list">
               {logs.map((log) => (
@@ -230,7 +235,7 @@ export default function EnvironmentShow({
 
         {dockerLogs && (
           <section className="card">
-            <h2>Logs Docker (100 dernières lignes)</h2>
+            <h2>{t('messages.environments.show.dockerLogs')}</h2>
             <pre className="docker-logs">{dockerLogs}</pre>
           </section>
         )}

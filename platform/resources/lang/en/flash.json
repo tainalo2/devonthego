@@ -1,0 +1,45 @@
+{
+  "setup": {
+    "admin_only": "Only an administrator can complete setup.",
+    "deploy_failed": "Deployment failed: {message}"
+  },
+  "environments": {
+    "created": "Environment \"{name}\" created.",
+    "create_failed": "Unable to create environment.",
+    "permission_denied": "Permission denied.",
+    "updated": "Environment updated.",
+    "update_failed": "Update failed.",
+    "assignments_updated": "Assigned users updated.",
+    "started": "Environment started.",
+    "start_failed": "Start failed.",
+    "stopped": "Environment stopped.",
+    "stop_failed": "Stop failed.",
+    "deleted": "Environment deleted.",
+    "delete_failed": "Delete failed.",
+    "credentials_regenerated": "Credentials regenerated.",
+    "regenerate_failed": "Regeneration failed."
+  },
+  "account": {
+    "setup_required": "Complete initial setup before creating an account.",
+    "signup_disabled": "Public sign-up is disabled."
+  },
+  "webhooks": {
+    "created": "Webhook created.",
+    "updated": "Webhook updated.",
+    "deleted": "Webhook deleted."
+  },
+  "images": {
+    "created": "Template \"{name}\" created. Start a build to use it.",
+    "updated": "Template updated.",
+    "build_in_progress": "A build is already in progress.",
+    "build_started": "Build \"{name}\" started in the background.",
+    "builtin_delete_denied": "Built-in templates cannot be deleted.",
+    "deleted": "Template deleted."
+  },
+  "users": {
+    "created": "User created.",
+    "updated": "User updated.",
+    "cannot_delete_self": "You cannot delete your own account.",
+    "deleted": "User deleted."
+  }
+}

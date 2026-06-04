@@ -1,4 +1,5 @@
 import AppLayout from '~/layouts/app'
+import { useI18n } from '~/hooks/use_i18n'
 
 type Settings = {
   domain: string
@@ -17,64 +18,65 @@ type Props = {
 }
 
 export default function SettingsIndex({ settings }: Props) {
+  const { t } = useI18n()
+
   return (
     <AppLayout>
       <div className="page">
         <div className="page-header">
-          <h1>Paramètres plateforme</h1>
+          <h1>{t('messages.settings.title')}</h1>
         </div>
 
         <section className="card">
-          <p className="muted">
-            Configuration lue depuis les variables d&apos;environnement. Modifiez le fichier{' '}
-            <code>.env</code> et redémarrez la plateforme pour appliquer les changements.
-          </p>
+          <p className="muted">{t('messages.settings.envHint')}</p>
 
           <dl className="detail-list settings-list">
             <div>
-              <dt>Domaine</dt>
+              <dt>{t('messages.settings.domain')}</dt>
               <dd>{settings.domain}</dd>
             </div>
             <div>
-              <dt>URL admin</dt>
+              <dt>{t('messages.settings.adminUrl')}</dt>
               <dd>{settings.appUrl}</dd>
             </div>
             <div>
-              <dt>Réseau Docker</dt>
+              <dt>{t('messages.settings.dockerNetwork')}</dt>
               <dd>{settings.dockerNetwork}</dd>
             </div>
             <div>
-              <dt>Registry local</dt>
+              <dt>{t('messages.settings.localRegistry')}</dt>
               <dd>{settings.dockerRegistry}</dd>
             </div>
             <div>
-              <dt>Chemin workspaces</dt>
+              <dt>{t('messages.settings.workspacePath')}</dt>
               <dd>{settings.workspacePath}</dd>
             </div>
             <div>
-              <dt>CPU par défaut</dt>
-              <dd>{settings.defaultCpuLimit} core(s)</dd>
+              <dt>{t('messages.settings.defaultCpu')}</dt>
+              <dd>{t('messages.settings.cores', { count: settings.defaultCpuLimit })}</dd>
             </div>
             <div>
-              <dt>RAM par défaut</dt>
+              <dt>{t('messages.settings.defaultRam')}</dt>
               <dd>{settings.defaultMemoryLimit}</dd>
             </div>
             <div>
-              <dt>Base de données</dt>
+              <dt>{t('messages.settings.database')}</dt>
               <dd>{settings.dbConnection}</dd>
             </div>
             <div>
-              <dt>Inscription publique</dt>
-              <dd>{settings.allowPublicSignup ? 'Activée' : 'Désactivée'}</dd>
+              <dt>{t('messages.settings.publicSignup')}</dt>
+              <dd>
+                {settings.allowPublicSignup
+                  ? t('messages.settings.publicSignupEnabled')
+                  : t('messages.settings.publicSignupDisabled')}
+              </dd>
             </div>
           </dl>
         </section>
 
         <section className="card">
-          <h2>Maintenance</h2>
-          <p className="muted">
-            Commande cron recommandée pour synchroniser les statuts Docker :
-          </p>
+          <h2>{t('messages.settings.maintenance')}</h2>
+          <p className="muted">{t('messages.settings.cronHint')}</p>
           <pre className="docker-logs">node ace dotg:sync-environments</pre>
         </section>
       </div>

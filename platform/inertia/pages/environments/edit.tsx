@@ -1,5 +1,6 @@
 import AppLayout from '~/layouts/app'
 import { Form, Link } from '@adonisjs/inertia/react'
+import { useI18n } from '~/hooks/use_i18n'
 
 type Environment = {
   id: number
@@ -16,35 +17,40 @@ type Props = {
 }
 
 export default function EnvironmentsEdit({ environment }: Props) {
+  const { t, statusLabel } = useI18n()
+
   return (
     <AppLayout>
       <div className="page">
         <div className="page-header">
-          <h1>Modifier {environment.name}</h1>
+          <h1>{t('messages.environments.editTitle', { name: environment.name })}</h1>
           <Link route="environments.show" routeParams={{ id: environment.id }}>
-            Retour
+            {t('messages.common.back')}
           </Link>
         </div>
 
         <section className="card form-card">
           <p className="muted">
-            Statut actuel : <span className={`badge badge-${environment.status}`}>{environment.status}</span>
+            {t('messages.environments.form.currentStatus')}{' '}
+            <span className={`badge badge-${environment.status}`}>
+              {statusLabel(environment.status)}
+            </span>
             {' — '}
-            un changement de CPU/RAM recréera le conteneur s&apos;il est en cours d&apos;exécution.
+            {t('messages.environments.form.recreateHint')}
           </p>
 
           <Form route="environments.update" routeParams={{ id: environment.id }} className="form">
             {({ errors }) => (
               <>
                 <label>
-                  Nom
+                  {t('messages.common.name')}
                   <input type="text" name="name" defaultValue={environment.name} required />
                   {errors.name && <span className="error">{errors.name}</span>}
                 </label>
 
                 <div className="form-row">
                   <label>
-                    CPU (cores)
+                    {t('messages.environments.form.cpu')}
                     <input
                       type="number"
                       name="cpuLimit"
@@ -54,7 +60,7 @@ export default function EnvironmentsEdit({ environment }: Props) {
                     />
                   </label>
                   <label>
-                    RAM (Mo)
+                    {t('messages.environments.form.ram')}
                     <input
                       type="number"
                       name="memoryLimitMb"
@@ -66,7 +72,7 @@ export default function EnvironmentsEdit({ environment }: Props) {
                 </div>
 
                 <label>
-                  URL dépôt Git (optionnel)
+                  {t('messages.environments.form.gitRepoOptional')}
                   <input
                     type="url"
                     name="gitRepoUrl"
@@ -76,7 +82,7 @@ export default function EnvironmentsEdit({ environment }: Props) {
                 </label>
 
                 <label>
-                  Branche Git
+                  {t('messages.environments.form.gitBranchLabel')}
                   <input
                     type="text"
                     name="gitBranch"
@@ -86,7 +92,7 @@ export default function EnvironmentsEdit({ environment }: Props) {
                 </label>
 
                 <button type="submit" className="btn btn-primary">
-                  Enregistrer
+                  {t('messages.common.save')}
                 </button>
               </>
             )}

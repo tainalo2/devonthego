@@ -69,7 +69,7 @@ export default class EnvironmentsController {
     })
   }
 
-  async store({ request, response, auth, session }: HttpContext) {
+  async store({ request, response, auth, session, i18n }: HttpContext) {
     const user = auth.user!
     const payload = await request.validateUsing(createEnvironmentValidator)
     const service = new EnvironmentService()
@@ -88,13 +88,13 @@ export default class EnvironmentsController {
         gitBranch: payload.gitBranch || null,
       })
 
-      session.flash('success', `Environnement « ${environment.name} » créé.`)
+      session.flash('success', i18n.t('flash.environments.created', { name: environment.name }))
       session.flash('freshCredentials', '1')
       return response.redirect().toRoute('environments.show', { id: environment.id })
     } catch (error) {
       session.flash(
         'error',
-        error instanceof Error ? error.message : "Impossible de créer l'environnement."
+        error instanceof Error ? error.message : i18n.t('flash.environments.create_failed')
       )
       return response.redirect().back()
     }
@@ -220,14 +220,14 @@ export default class EnvironmentsController {
     })
   }
 
-  async update({ request, response, params, session, auth }: HttpContext) {
+  async update({ request, response, params, session, auth, i18n }: HttpContext) {
     const user = auth.user!
     const Environment = (await import('#models/environment')).default
     const service = new EnvironmentService()
     const environment = await Environment.findOrFail(params.id)
 
     if (!user.isAdmin && environment.ownerId !== user.id) {
-      session.flash('error', 'Permission refusée.')
+      session.flash('error', i18n.t('flash.environments.permission_denied'))
       return response.redirect().toRoute('environments.show', { id: environment.id })
     }
 
@@ -235,89 +235,104 @@ export default class EnvironmentsController {
 
     try {
       await service.update(environment, payload)
-      session.flash('success', 'Environnement mis à jour.')
+      session.flash('success', i18n.t('flash.environments.updated'))
     } catch (error) {
-      session.flash('error', error instanceof Error ? error.message : 'Échec de la mise à jour.')
+      session.flash(
+        'error',
+        error instanceof Error ? error.message : i18n.t('flash.environments.update_failed')
+      )
     }
 
     return response.redirect().toRoute('environments.show', { id: environment.id })
   }
 
-  async assignUsers({ request, response, params, session, auth }: HttpContext) {
+  async assignUsers({ request, response, params, session, auth, i18n }: HttpContext) {
     const user = auth.user!
     const Environment = (await import('#models/environment')).default
     const service = new EnvironmentService()
     const environment = await Environment.findOrFail(params.id)
 
     if (!user.isAdmin && environment.ownerId !== user.id) {
-      session.flash('error', 'Permission refusée.')
+      session.flash('error', i18n.t('flash.environments.permission_denied'))
       return response.redirect().toRoute('environments.show', { id: environment.id })
     }
 
     const payload = await request.validateUsing(assignEnvironmentUsersValidator)
 
     await service.assignUsers(environment, payload.assignedUserIds ?? [])
-    session.flash('success', 'Utilisateurs assignés mis à jour.')
+    session.flash('success', i18n.t('flash.environments.assignments_updated'))
 
     return response.redirect().toRoute('environments.show', { id: environment.id })
   }
 
-  async start({ params, response, session }: HttpContext) {
+  async start({ params, response, session, i18n }: HttpContext) {
     const Environment = (await import('#models/environment')).default
     const service = new EnvironmentService()
     const environment = await Environment.findOrFail(params.id)
 
     try {
       await service.start(environment)
-      session.flash('success', 'Environnement démarré.')
+      session.flash('success', i18n.t('flash.environments.started'))
     } catch (error) {
-      session.flash('error', error instanceof Error ? error.message : 'Échec du démarrage.')
+      session.flash(
+        'error',
+        error instanceof Error ? error.message : i18n.t('flash.environments.start_failed')
+      )
     }
 
     return response.redirect().toRoute('environments.show', { id: environment.id })
   }
 
-  async stop({ params, response, session }: HttpContext) {
+  async stop({ params, response, session, i18n }: HttpContext) {
     const Environment = (await import('#models/environment')).default
     const service = new EnvironmentService()
     const environment = await Environment.findOrFail(params.id)
 
     try {
       await service.stop(environment)
-      session.flash('success', 'Environnement arrêté.')
+      session.flash('success', i18n.t('flash.environments.stopped'))
     } catch (error) {
-      session.flash('error', error instanceof Error ? error.message : "Échec de l'arrêt.")
+      session.flash(
+        'error',
+        error instanceof Error ? error.message : i18n.t('flash.environments.stop_failed')
+      )
     }
 
     return response.redirect().toRoute('environments.show', { id: environment.id })
   }
 
-  async destroy({ params, response, session }: HttpContext) {
+  async destroy({ params, response, session, i18n }: HttpContext) {
     const Environment = (await import('#models/environment')).default
     const service = new EnvironmentService()
     const environment = await Environment.findOrFail(params.id)
 
     try {
       await service.delete(environment)
-      session.flash('success', 'Environnement supprimé.')
+      session.flash('success', i18n.t('flash.environments.deleted'))
       return response.redirect().toRoute('environments.index')
     } catch (error) {
-      session.flash('error', error instanceof Error ? error.message : 'Échec de la suppression.')
+      session.flash(
+        'error',
+        error instanceof Error ? error.message : i18n.t('flash.environments.delete_failed')
+      )
       return response.redirect().toRoute('environments.show', { id: environment.id })
     }
   }
 
-  async regenerateCredentials({ params, response, session }: HttpContext) {
+  async regenerateCredentials({ params, response, session, i18n }: HttpContext) {
     const Environment = (await import('#models/environment')).default
     const service = new EnvironmentService()
     const environment = await Environment.findOrFail(params.id)
 
     try {
       await service.regenerateCredentials(environment)
-      session.flash('success', 'Identifiants régénérés.')
+      session.flash('success', i18n.t('flash.environments.credentials_regenerated'))
       session.flash('freshCredentials', true)
     } catch (error) {
-      session.flash('error', error instanceof Error ? error.message : 'Échec de la régénération.')
+      session.flash(
+        'error',
+        error instanceof Error ? error.message : i18n.t('flash.environments.regenerate_failed')
+      )
     }
 
     return response.redirect().toRoute('environments.show', { id: environment.id })

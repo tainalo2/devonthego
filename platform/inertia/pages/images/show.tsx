@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { router } from '@inertiajs/react'
 import AppLayout from '~/layouts/app'
 import { Form, Link } from '@adonisjs/inertia/react'
+import { useI18n } from '~/hooks/use_i18n'
 
 type Template = {
   id: number
@@ -24,6 +25,7 @@ type Props = {
 }
 
 export default function ImagesShow({ template: initial }: Props) {
+  const { t, buildStatusLabel, templateDescription } = useI18n()
   const [template, setTemplate] = useState(initial)
 
   useEffect(() => {
@@ -51,6 +53,11 @@ export default function ImagesShow({ template: initial }: Props) {
     return () => clearInterval(interval)
   }, [template.id, template.buildStatus])
 
+  const description =
+    template.isBuiltin && template.slug
+      ? templateDescription(template.slug, template.description)
+      : (template.description ?? '—')
+
   return (
     <AppLayout>
       <div className="page">
@@ -63,34 +70,36 @@ export default function ImagesShow({ template: initial }: Props) {
           </div>
           <div className="actions-row">
             <Link route="images.edit" routeParams={{ id: template.id }} className="btn">
-              Modifier
+              {t('messages.common.edit')}
             </Link>
-            <Link route="images.index">Retour</Link>
+            <Link route="images.index">{t('messages.common.back')}</Link>
           </div>
         </div>
 
         <div className="detail-grid">
           <section className="card">
-            <h2>Statut du build</h2>
+            <h2>{t('messages.images.show.buildStatus')}</h2>
             <dl className="detail-list">
               <div>
-                <dt>Statut</dt>
+                <dt>{t('messages.common.status')}</dt>
                 <dd>
-                  <span className={`badge badge-${template.buildStatus}`}>{template.buildStatus}</span>
+                  <span className={`badge badge-${template.buildStatus}`}>
+                    {buildStatusLabel(template.buildStatus)}
+                  </span>
                   {template.buildStatus === 'building' && (
-                    <span className="muted small"> — actualisation auto…</span>
+                    <span className="muted small">{t('messages.images.show.autoRefresh')}</span>
                   )}
                 </dd>
               </div>
               {template.lastBuiltAt && (
                 <div>
-                  <dt>Dernier build</dt>
+                  <dt>{t('messages.images.show.lastBuild')}</dt>
                   <dd>{template.lastBuiltAt}</dd>
                 </div>
               )}
               {template.buildError && (
                 <div>
-                  <dt>Erreur</dt>
+                  <dt>{t('messages.common.error')}</dt>
                   <dd className="text-error">{template.buildError}</dd>
                 </div>
               )}
@@ -102,25 +111,27 @@ export default function ImagesShow({ template: initial }: Props) {
                 className="btn btn-primary"
                 disabled={template.buildStatus === 'building'}
               >
-                {template.buildStatus === 'building' ? 'Build en cours…' : 'Lancer le build Docker'}
+                {template.buildStatus === 'building'
+                  ? t('messages.images.show.buildInProgress')
+                  : t('messages.images.show.startBuild')}
               </button>
             </Form>
           </section>
 
           <section className="card">
-            <h2>Informations</h2>
+            <h2>{t('messages.images.show.info')}</h2>
             <dl className="detail-list">
               <div>
-                <dt>Description</dt>
-                <dd>{template.description ?? '—'}</dd>
+                <dt>{t('messages.images.templateDescription')}</dt>
+                <dd>{description}</dd>
               </div>
               <div>
-                <dt>Template par défaut</dt>
-                <dd>{template.isDefault ? 'Oui' : 'Non'}</dd>
+                <dt>{t('messages.images.show.defaultTemplate')}</dt>
+                <dd>{template.isDefault ? t('messages.common.yes') : t('messages.common.no')}</dd>
               </div>
               <div>
-                <dt>Intégré</dt>
-                <dd>{template.isBuiltin ? 'Oui' : 'Non'}</dd>
+                <dt>{t('messages.images.show.builtin')}</dt>
+                <dd>{template.isBuiltin ? t('messages.common.yes') : t('messages.common.no')}</dd>
               </div>
             </dl>
           </section>
@@ -128,14 +139,14 @@ export default function ImagesShow({ template: initial }: Props) {
 
         {template.buildLog && (
           <section className="card">
-            <h2>Journal de build</h2>
+            <h2>{t('messages.images.show.buildLog')}</h2>
             <pre className="docker-logs">{template.buildLog}</pre>
           </section>
         )}
 
         {template.dockerfile && (
           <section className="card">
-            <h2>Dockerfile</h2>
+            <h2>{t('messages.images.show.dockerfile')}</h2>
             <pre className="docker-logs">{template.dockerfile}</pre>
           </section>
         )}
@@ -143,7 +154,7 @@ export default function ImagesShow({ template: initial }: Props) {
         {!template.isBuiltin && (
           <Form route="images.destroy" routeParams={{ id: template.id }} className="danger-zone">
             <button type="submit" className="btn btn-danger">
-              Supprimer le template
+              {t('messages.images.form.deleteTemplate')}
             </button>
           </Form>
         )}

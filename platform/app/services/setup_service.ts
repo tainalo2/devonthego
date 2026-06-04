@@ -1,6 +1,7 @@
 import PlatformSetting from '#models/platform_setting'
 import User from '#models/user'
 import env from '#start/env'
+import i18nManager from '@adonisjs/i18n/services/main'
 import { spawn } from 'node:child_process'
 import { readFile, writeFile } from 'node:fs/promises'
 import { DateTime } from 'luxon'
@@ -172,7 +173,7 @@ export default class SetupService {
 
     for (const key of required) {
       if (!values.get(key)) {
-        throw new Error(`Variable ${key} manquante dans .env`)
+        throw new Error(i18nManager.locale('en').t('messages.errors.missing_env_var', { var: key }))
       }
     }
 

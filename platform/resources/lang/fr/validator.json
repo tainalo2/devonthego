@@ -1,0 +1,49 @@
+{
+  "shared": {
+    "fields": {
+      "email": "email",
+      "password": "mot de passe",
+      "passwordConfirmation": "confirmation du mot de passe",
+      "fullName": "nom complet",
+      "name": "nom",
+      "domain": "domaine",
+      "acmeEmail": "email Let's Encrypt",
+      "adminEmail": "email administrateur",
+      "adminFullName": "nom complet administrateur",
+      "adminPassword": "mot de passe administrateur",
+      "adminPasswordConfirmation": "confirmation du mot de passe",
+      "allowPublicSignup": "inscription publique",
+      "envCpuLimit": "limite CPU",
+      "envMemoryLimit": "limite mémoire",
+      "imageTemplateId": "template d'image",
+      "ownerId": "propriétaire",
+      "cpuLimit": "limite CPU",
+      "memoryLimitMb": "limite mémoire",
+      "assignedUserIds": "utilisateurs assignés",
+      "gitRepoUrl": "URL du dépôt Git",
+      "gitBranch": "branche Git",
+      "url": "URL",
+      "secret": "secret",
+      "events": "événements",
+      "isActive": "statut actif",
+      "role": "rôle",
+      "description": "description",
+      "dockerfile": "Dockerfile",
+      "isDefault": "template par défaut"
+    },
+    "messages": {
+      "required": "Le champ {field} est obligatoire",
+      "email": "Le champ {field} doit être une adresse email valide",
+      "minLength": "Le champ {field} doit contenir au moins {min} caractères",
+      "maxLength": "Le champ {field} ne doit pas dépasser {max} caractères",
+      "confirmed": "La confirmation du champ {field} ne correspond pas",
+      "regex": "Le format du champ {field} est invalide",
+      "url": "Le champ {field} doit être une URL valide",
+      "unique": "Le champ {field} doit être unique",
+      "number": "Le champ {field} doit être un nombre",
+      "enum": "La valeur sélectionnée pour {field} est invalide",
+      "min": "Le champ {field} doit être au minimum {min}",
+      "max": "Le champ {field} ne doit pas dépasser {max}"
+    }
+  }
+}

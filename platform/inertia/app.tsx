@@ -7,7 +7,8 @@ import { createInertiaApp } from '@inertiajs/react'
 import { TuyauProvider } from '@adonisjs/inertia/react'
 import { resolvePageComponent } from '@adonisjs/inertia/helpers'
 
-const appName = 'Dev on the go'
+const defaultAppName = 'Dev on the go'
+let appName = defaultAppName
 
 createInertiaApp({
   title: (title) => (title ? `${title} - ${appName}` : appName),
@@ -19,6 +20,10 @@ createInertiaApp({
     )
   },
   setup({ el, App, props }) {
+    const translations = (props.initialPage.props as { translations?: Record<string, string> })
+      .translations
+    appName = translations?.['messages.app.name'] ?? defaultAppName
+
     createRoot(el).render(
       <TuyauProvider client={client}>
         <App {...props} />

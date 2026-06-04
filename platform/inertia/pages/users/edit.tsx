@@ -1,5 +1,6 @@
 import AppLayout from '~/layouts/app'
 import { Form, Link } from '@adonisjs/inertia/react'
+import { useI18n } from '~/hooks/use_i18n'
 
 type User = {
   id: number
@@ -14,12 +15,14 @@ type Props = {
 }
 
 export default function UsersEdit({ user }: Props) {
+  const { t, roleLabel } = useI18n()
+
   return (
     <AppLayout>
       <div className="page">
         <div className="page-header">
-          <h1>Modifier {user.email}</h1>
-          <Link route="users.index">Retour</Link>
+          <h1>{t('messages.users.editTitle', { email: user.email })}</h1>
+          <Link route="users.index">{t('messages.common.back')}</Link>
         </div>
 
         <section className="card form-card">
@@ -27,23 +30,23 @@ export default function UsersEdit({ user }: Props) {
             {({ errors }) => (
               <>
                 <label>
-                  Nom complet
+                  {t('messages.users.form.fullName')}
                   <input type="text" name="fullName" defaultValue={user.fullName ?? ''} />
                 </label>
                 <label>
-                  Email
+                  {t('messages.common.email')}
                   <input type="email" name="email" defaultValue={user.email} required />
                   {errors.email && <span className="error">{errors.email}</span>}
                 </label>
                 <label>
-                  Nouveau mot de passe (optionnel)
+                  {t('messages.users.form.newPassword')}
                   <input type="password" name="password" />
                 </label>
                 <label>
-                  Rôle
+                  {t('messages.users.form.role')}
                   <select name="role" defaultValue={user.role}>
-                    <option value="user">Utilisateur</option>
-                    <option value="admin">Administrateur</option>
+                    <option value="user">{roleLabel('user')}</option>
+                    <option value="admin">{roleLabel('admin')}</option>
                   </select>
                 </label>
                 <label className="checkbox">
@@ -53,10 +56,10 @@ export default function UsersEdit({ user }: Props) {
                     value="1"
                     defaultChecked={user.isActive}
                   />
-                  Compte actif
+                  {t('messages.users.form.activeAccount')}
                 </label>
                 <button type="submit" className="btn btn-primary">
-                  Enregistrer
+                  {t('messages.common.save')}
                 </button>
               </>
             )}
@@ -64,7 +67,7 @@ export default function UsersEdit({ user }: Props) {
 
           <Form route="users.destroy" routeParams={{ id: user.id }} className="danger-zone">
             <button type="submit" className="btn btn-danger">
-              Supprimer l&apos;utilisateur
+              {t('messages.users.form.deleteUser')}
             </button>
           </Form>
         </section>

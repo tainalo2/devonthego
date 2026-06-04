@@ -1,0 +1,49 @@
+{
+  "shared": {
+    "fields": {
+      "email": "email",
+      "password": "password",
+      "passwordConfirmation": "password confirmation",
+      "fullName": "full name",
+      "name": "name",
+      "domain": "domain",
+      "acmeEmail": "Let's Encrypt email",
+      "adminEmail": "administrator email",
+      "adminFullName": "administrator full name",
+      "adminPassword": "administrator password",
+      "adminPasswordConfirmation": "password confirmation",
+      "allowPublicSignup": "public sign-up",
+      "envCpuLimit": "CPU limit",
+      "envMemoryLimit": "memory limit",
+      "imageTemplateId": "image template",
+      "ownerId": "owner",
+      "cpuLimit": "CPU limit",
+      "memoryLimitMb": "memory limit",
+      "assignedUserIds": "assigned users",
+      "gitRepoUrl": "Git repository URL",
+      "gitBranch": "Git branch",
+      "url": "URL",
+      "secret": "secret",
+      "events": "events",
+      "isActive": "active status",
+      "role": "role",
+      "description": "description",
+      "dockerfile": "Dockerfile",
+      "isDefault": "default template"
+    },
+    "messages": {
+      "required": "The {field} field is required",
+      "email": "The {field} field must be a valid email address",
+      "minLength": "The {field} field must be at least {min} characters",
+      "maxLength": "The {field} field must not exceed {max} characters",
+      "confirmed": "The {field} field confirmation does not match",
+      "regex": "The {field} field format is invalid",
+      "url": "The {field} field must be a valid URL",
+      "unique": "The {field} field must be unique",
+      "number": "The {field} field must be a number",
+      "enum": "The selected {field} is invalid",
+      "min": "The {field} field must be at least {min}",
+      "max": "The {field} field must not exceed {max}"
+    }
+  }
+}

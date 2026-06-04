@@ -1,5 +1,6 @@
 import AppLayout from '~/layouts/app'
 import { Form, Link } from '@adonisjs/inertia/react'
+import { useI18n } from '~/hooks/use_i18n'
 
 type Template = {
   id: number
@@ -16,13 +17,15 @@ type Props = {
 }
 
 export default function ImagesEdit({ template }: Props) {
+  const { t } = useI18n()
+
   return (
     <AppLayout>
       <div className="page">
         <div className="page-header">
-          <h1>Modifier {template.name}</h1>
+          <h1>{t('messages.images.editTitle', { name: template.name })}</h1>
           <Link route="images.show" routeParams={{ id: template.id }}>
-            Retour
+            {t('messages.common.back')}
           </Link>
         </div>
 
@@ -31,18 +34,18 @@ export default function ImagesEdit({ template }: Props) {
             {({ errors }) => (
               <>
                 <label>
-                  Nom
+                  {t('messages.common.name')}
                   <input type="text" name="name" defaultValue={template.name} required />
                   {errors.name && <span className="error">{errors.name}</span>}
                 </label>
 
                 <label>
-                  Description
+                  {t('messages.common.description')}
                   <input type="text" name="description" defaultValue={template.description ?? ''} />
                 </label>
 
                 <label>
-                  Dockerfile
+                  {t('messages.images.form.dockerfile')}
                   <textarea name="dockerfile" rows={14} defaultValue={template.dockerfile} />
                 </label>
 
@@ -53,11 +56,11 @@ export default function ImagesEdit({ template }: Props) {
                     value="1"
                     defaultChecked={template.isDefault}
                   />
-                  Template par défaut
+                  {t('messages.images.form.defaultTemplate')}
                 </label>
 
                 <button type="submit" className="btn btn-primary">
-                  Enregistrer
+                  {t('messages.common.save')}
                 </button>
               </>
             )}

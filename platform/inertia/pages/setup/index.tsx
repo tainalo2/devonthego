@@ -1,5 +1,6 @@
 import { Form } from '@adonisjs/inertia/react'
 import { useState } from 'react'
+import { useI18n } from '~/hooks/use_i18n'
 
 type Defaults = {
   domain: string
@@ -16,31 +17,31 @@ type Props = {
   bootstrapUrl: string
 }
 
-const STEPS = ['Domaine & TLS', 'Administrateur', 'Ressources', 'Confirmation']
-
 export default function SetupIndex({ defaults, bootstrapUrl }: Props) {
+  const { t } = useI18n()
   const [step, setStep] = useState(0)
+
+  const steps = [
+    t('messages.setup.steps.domain'),
+    t('messages.setup.steps.admin'),
+    t('messages.setup.steps.resources'),
+    t('messages.setup.steps.confirm'),
+  ]
 
   return (
     <div className="setup-page">
       <div className="setup-container">
         <header className="setup-header">
-          <h1>Configuration initiale</h1>
+          <h1>{t('messages.setup.title')}</h1>
+          <p className="muted">{t('messages.setup.welcome')}</p>
           <p className="muted">
-            Bienvenue sur Dev on the go. Complétez cette configuration pour activer HTTPS et
-            déployer la plateforme en production.
+            {t('messages.setup.bootstrapAccess')} <code>{bootstrapUrl}</code>
           </p>
-          <p className="muted">
-            Accès bootstrap (HTTPS autosigné) : <code>{bootstrapUrl}</code>
-          </p>
-          <p className="muted">
-            Acceptez l&apos;avertissement certificat du navigateur — les données du formulaire sont
-            chiffrées en transit.
-          </p>
+          <p className="muted">{t('messages.setup.certHint')}</p>
         </header>
 
-        <nav className="setup-steps" aria-label="Étapes">
-          {STEPS.map((label, index) => (
+        <nav className="setup-steps" aria-label={t('messages.setup.stepsLabel')}>
+          {steps.map((label, index) => (
             <span
               key={label}
               className={`setup-step ${index === step ? 'active' : ''} ${index < step ? 'done' : ''}`}
@@ -54,13 +55,10 @@ export default function SetupIndex({ defaults, bootstrapUrl }: Props) {
           {({ errors, processing }) => (
             <>
               <section className={`card setup-panel ${step === 0 ? '' : 'hidden'}`}>
-                <h2>Domaine &amp; certificats TLS</h2>
-                <p className="muted">
-                  Le domaine doit pointer vers ce serveur (enregistrement DNS A). Les certificats
-                  Let&apos;s Encrypt seront générés automatiquement.
-                </p>
+                <h2>{t('messages.setup.domain.title')}</h2>
+                <p className="muted">{t('messages.setup.domain.hint')}</p>
                 <div>
-                  <label htmlFor="domain">Domaine principal</label>
+                  <label htmlFor="domain">{t('messages.setup.domain.primaryDomain')}</label>
                   <input
                     type="text"
                     name="domain"
@@ -72,7 +70,7 @@ export default function SetupIndex({ defaults, bootstrapUrl }: Props) {
                   {errors.domain && <div className="field-error">{errors.domain}</div>}
                 </div>
                 <div>
-                  <label htmlFor="acmeEmail">Email Let&apos;s Encrypt</label>
+                  <label htmlFor="acmeEmail">{t('messages.setup.domain.acmeEmail')}</label>
                   <input
                     type="email"
                     name="acmeEmail"
@@ -84,17 +82,16 @@ export default function SetupIndex({ defaults, bootstrapUrl }: Props) {
                   {errors.acmeEmail && <div className="field-error">{errors.acmeEmail}</div>}
                 </div>
                 <p className="muted">
-                  URL admin après configuration : <code>https://admin.&lt;domaine&gt;</code>
+                  {t('messages.setup.domain.adminUrlHint')}{' '}
+                  <code>https://admin.&lt;domain&gt;</code>
                 </p>
               </section>
 
               <section className={`card setup-panel ${step === 1 ? '' : 'hidden'}`}>
-                <h2>Compte administrateur</h2>
-                <p className="muted">
-                  Remplace les identifiants bootstrap temporaires par votre compte définitif.
-                </p>
+                <h2>{t('messages.setup.admin.title')}</h2>
+                <p className="muted">{t('messages.setup.admin.hint')}</p>
                 <div>
-                  <label htmlFor="adminEmail">Email</label>
+                  <label htmlFor="adminEmail">{t('messages.common.email')}</label>
                   <input
                     type="email"
                     name="adminEmail"
@@ -105,7 +102,7 @@ export default function SetupIndex({ defaults, bootstrapUrl }: Props) {
                   {errors.adminEmail && <div className="field-error">{errors.adminEmail}</div>}
                 </div>
                 <div>
-                  <label htmlFor="adminFullName">Nom complet</label>
+                  <label htmlFor="adminFullName">{t('messages.auth.signup.fullName')}</label>
                   <input
                     type="text"
                     name="adminFullName"
@@ -116,12 +113,14 @@ export default function SetupIndex({ defaults, bootstrapUrl }: Props) {
                   {errors.adminFullName && <div className="field-error">{errors.adminFullName}</div>}
                 </div>
                 <div>
-                  <label htmlFor="adminPassword">Mot de passe</label>
+                  <label htmlFor="adminPassword">{t('messages.common.password')}</label>
                   <input type="password" name="adminPassword" id="adminPassword" required />
                   {errors.adminPassword && <div className="field-error">{errors.adminPassword}</div>}
                 </div>
                 <div>
-                  <label htmlFor="adminPasswordConfirmation">Confirmer le mot de passe</label>
+                  <label htmlFor="adminPasswordConfirmation">
+                    {t('messages.auth.signup.passwordConfirm')}
+                  </label>
                   <input
                     type="password"
                     name="adminPasswordConfirmation"
@@ -141,15 +140,15 @@ export default function SetupIndex({ defaults, bootstrapUrl }: Props) {
                       defaultChecked={defaults.allowPublicSignup}
                       value="1"
                     />
-                    Autoriser l&apos;inscription publique
+                    {t('messages.setup.admin.allowPublicSignup')}
                   </label>
                 </div>
               </section>
 
               <section className={`card setup-panel ${step === 2 ? '' : 'hidden'}`}>
-                <h2>Limites par environnement</h2>
+                <h2>{t('messages.setup.resources.title')}</h2>
                 <div>
-                  <label htmlFor="envCpuLimit">CPU (cores)</label>
+                  <label htmlFor="envCpuLimit">{t('messages.setup.resources.cpu')}</label>
                   <input
                     type="number"
                     name="envCpuLimit"
@@ -162,7 +161,7 @@ export default function SetupIndex({ defaults, bootstrapUrl }: Props) {
                   {errors.envCpuLimit && <div className="field-error">{errors.envCpuLimit}</div>}
                 </div>
                 <div>
-                  <label htmlFor="envMemoryLimit">Mémoire (ex: 1024m, 2g)</label>
+                  <label htmlFor="envMemoryLimit">{t('messages.setup.resources.memory')}</label>
                   <input
                     type="text"
                     name="envMemoryLimit"
@@ -177,35 +176,32 @@ export default function SetupIndex({ defaults, bootstrapUrl }: Props) {
               </section>
 
               <section className={`card setup-panel ${step === 3 ? '' : 'hidden'}`}>
-                <h2>Confirmation</h2>
-                <p>
-                  La plateforme va écrire la configuration, recréer Traefik avec HTTPS et redémarrer.
-                  Cette opération prend environ 30 secondes.
-                </p>
+                <h2>{t('messages.setup.confirm.title')}</h2>
+                <p>{t('messages.setup.confirm.description')}</p>
                 <ul className="setup-checklist">
-                  <li>Vérifiez que le DNS pointe vers ce serveur</li>
-                  <li>Les ports 80 et 443 doivent être ouverts</li>
-                  <li>Vous serez déconnecté et devrez vous reconnecter sur la nouvelle URL</li>
+                  <li>{t('messages.setup.confirm.checkDns')}</li>
+                  <li>{t('messages.setup.confirm.checkPorts')}</li>
+                  <li>{t('messages.setup.confirm.checkLogout')}</li>
                 </ul>
               </section>
 
               <div className="setup-actions">
                 {step > 0 && (
                   <button type="button" className="btn" onClick={() => setStep((s) => s - 1)}>
-                    Précédent
+                    {t('messages.common.previous')}
                   </button>
                 )}
-                {step < STEPS.length - 1 ? (
+                {step < steps.length - 1 ? (
                   <button
                     type="button"
                     className="btn btn-primary"
                     onClick={() => setStep((s) => s + 1)}
                   >
-                    Suivant
+                    {t('messages.common.next')}
                   </button>
                 ) : (
                   <button type="submit" className="btn btn-primary" disabled={processing}>
-                    {processing ? 'Déploiement en cours…' : 'Déployer la plateforme'}
+                    {processing ? t('messages.setup.deploying') : t('messages.setup.deploy')}
                   </button>
                 )}
               </div>

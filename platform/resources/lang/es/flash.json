@@ -1,0 +1,45 @@
+{
+  "setup": {
+    "admin_only": "Solo un administrador puede completar la configuración.",
+    "deploy_failed": "Error de despliegue: {message}"
+  },
+  "environments": {
+    "created": "Entorno «{name}» creado.",
+    "create_failed": "No se pudo crear el entorno.",
+    "permission_denied": "Permiso denegado.",
+    "updated": "Entorno actualizado.",
+    "update_failed": "Error al actualizar.",
+    "assignments_updated": "Usuarios asignados actualizados.",
+    "started": "Entorno iniciado.",
+    "start_failed": "Error al iniciar.",
+    "stopped": "Entorno detenido.",
+    "stop_failed": "Error al detener.",
+    "deleted": "Entorno eliminado.",
+    "delete_failed": "Error al eliminar.",
+    "credentials_regenerated": "Credenciales regeneradas.",
+    "regenerate_failed": "Error al regenerar."
+  },
+  "account": {
+    "setup_required": "Completa la configuración inicial antes de crear una cuenta.",
+    "signup_disabled": "El registro público está desactivado."
+  },
+  "webhooks": {
+    "created": "Webhook creado.",
+    "updated": "Webhook actualizado.",
+    "deleted": "Webhook eliminado."
+  },
+  "images": {
+    "created": "Plantilla «{name}» creada. Inicia un build para usarla.",
+    "updated": "Plantilla actualizada.",
+    "build_in_progress": "Ya hay un build en curso.",
+    "build_started": "Build «{name}» iniciado en segundo plano.",
+    "builtin_delete_denied": "Las plantillas integradas no se pueden eliminar.",
+    "deleted": "Plantilla eliminada."
+  },
+  "users": {
+    "created": "Usuario creado.",
+    "updated": "Usuario actualizado.",
+    "cannot_delete_self": "No puedes eliminar tu propia cuenta.",
+    "deleted": "Usuario eliminado."
+  }
+}

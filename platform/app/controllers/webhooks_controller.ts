@@ -27,7 +27,7 @@ export default class WebhooksController {
     })
   }
 
-  async store({ request, response, session }: HttpContext) {
+  async store({ request, response, session, i18n }: HttpContext) {
     const payload = await request.validateUsing(createWebhookValidator)
 
     await Webhook.create({
@@ -38,7 +38,7 @@ export default class WebhooksController {
       isActive: payload.isActive ?? true,
     })
 
-    session.flash('success', 'Webhook créé.')
+    session.flash('success', i18n.t('flash.webhooks.created'))
     return response.redirect().toRoute('webhooks.index')
   }
 
@@ -85,7 +85,7 @@ export default class WebhooksController {
     })
   }
 
-  async update({ request, response, params, session }: HttpContext) {
+  async update({ request, response, params, session, i18n }: HttpContext) {
     const webhook = await Webhook.findOrFail(params.id)
     const payload = await request.validateUsing(updateWebhookValidator)
 
@@ -101,14 +101,14 @@ export default class WebhooksController {
     }
 
     await webhook.save()
-    session.flash('success', 'Webhook mis à jour.')
+    session.flash('success', i18n.t('flash.webhooks.updated'))
     return response.redirect().toRoute('webhooks.show', { id: webhook.id })
   }
 
-  async destroy({ response, params, session }: HttpContext) {
+  async destroy({ response, params, session, i18n }: HttpContext) {
     const webhook = await Webhook.findOrFail(params.id)
     await webhook.delete()
-    session.flash('success', 'Webhook supprimé.')
+    session.flash('success', i18n.t('flash.webhooks.deleted'))
     return response.redirect().toRoute('webhooks.index')
   }
 }

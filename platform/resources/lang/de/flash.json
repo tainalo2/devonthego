@@ -1,0 +1,45 @@
+{
+  "setup": {
+    "admin_only": "Nur ein Administrator kann die Einrichtung abschließen.",
+    "deploy_failed": "Bereitstellung fehlgeschlagen: {message}"
+  },
+  "environments": {
+    "created": "Umgebung „{name}\" erstellt.",
+    "create_failed": "Umgebung konnte nicht erstellt werden.",
+    "permission_denied": "Zugriff verweigert.",
+    "updated": "Umgebung aktualisiert.",
+    "update_failed": "Aktualisierung fehlgeschlagen.",
+    "assignments_updated": "Zugewiesene Benutzer aktualisiert.",
+    "started": "Umgebung gestartet.",
+    "start_failed": "Start fehlgeschlagen.",
+    "stopped": "Umgebung gestoppt.",
+    "stop_failed": "Stoppen fehlgeschlagen.",
+    "deleted": "Umgebung gelöscht.",
+    "delete_failed": "Löschen fehlgeschlagen.",
+    "credentials_regenerated": "Zugangsdaten neu generiert.",
+    "regenerate_failed": "Regenerierung fehlgeschlagen."
+  },
+  "account": {
+    "setup_required": "Schließen Sie die Ersteinrichtung ab, bevor Sie ein Konto erstellen.",
+    "signup_disabled": "Öffentliche Registrierung ist deaktiviert."
+  },
+  "webhooks": {
+    "created": "Webhook erstellt.",
+    "updated": "Webhook aktualisiert.",
+    "deleted": "Webhook gelöscht."
+  },
+  "images": {
+    "created": "Vorlage „{name}\" erstellt. Starten Sie einen Build, um sie zu verwenden.",
+    "updated": "Vorlage aktualisiert.",
+    "build_in_progress": "Ein Build läuft bereits.",
+    "build_started": "Build „{name}\" im Hintergrund gestartet.",
+    "builtin_delete_denied": "Integrierte Vorlagen können nicht gelöscht werden.",
+    "deleted": "Vorlage gelöscht."
+  },
+  "users": {
+    "created": "Benutzer erstellt.",
+    "updated": "Benutzer aktualisiert.",
+    "cannot_delete_self": "Sie können Ihr eigenes Konto nicht löschen.",
+    "deleted": "Benutzer gelöscht."
+  }
+}

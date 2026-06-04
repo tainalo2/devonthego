@@ -1,17 +1,20 @@
 import AppLayout from '~/layouts/app'
 import { Form, Link } from '@adonisjs/inertia/react'
+import { useI18n } from '~/hooks/use_i18n'
 
 type Props = {
   defaultDockerfile: string
 }
 
 export default function ImagesCreate({ defaultDockerfile }: Props) {
+  const { t } = useI18n()
+
   return (
     <AppLayout>
       <div className="page">
         <div className="page-header">
-          <h1>Nouveau template d&apos;image</h1>
-          <Link route="images.index">Retour</Link>
+          <h1>{t('messages.images.createTitle')}</h1>
+          <Link route="images.index">{t('messages.common.back')}</Link>
         </div>
 
         <section className="card form-card">
@@ -19,29 +22,29 @@ export default function ImagesCreate({ defaultDockerfile }: Props) {
             {({ errors }) => (
               <>
                 <label>
-                  Nom
+                  {t('messages.common.name')}
                   <input type="text" name="name" required />
                   {errors.name && <span className="error">{errors.name}</span>}
                 </label>
 
                 <label>
-                  Description
+                  {t('messages.common.description')}
                   <input type="text" name="description" />
                 </label>
 
                 <label>
-                  Dockerfile
+                  {t('messages.images.form.dockerfile')}
                   <textarea name="dockerfile" rows={12} defaultValue={defaultDockerfile} />
                   {errors.dockerfile && <span className="error">{errors.dockerfile}</span>}
                 </label>
 
                 <label className="checkbox">
                   <input type="checkbox" name="isDefault" value="1" />
-                  Template par défaut
+                  {t('messages.images.form.defaultTemplate')}
                 </label>
 
                 <button type="submit" className="btn btn-primary">
-                  Créer le template
+                  {t('messages.images.form.submitCreate')}
                 </button>
               </>
             )}

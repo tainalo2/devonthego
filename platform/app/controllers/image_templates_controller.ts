@@ -35,7 +35,7 @@ export default class ImageTemplatesController {
     })
   }
 
-  async store({ request, response, session }: HttpContext) {
+  async store({ request, response, session, i18n }: HttpContext) {
     const payload = await request.validateUsing(createImageTemplateValidator)
     const slug = ImageBuilderService.slugFromName(payload.name)
 
@@ -54,7 +54,7 @@ export default class ImageTemplatesController {
       await db.from('image_templates').whereNot('id', template.id).update({ is_default: false })
     }
 
-    session.flash('success', `Template « ${template.name} » créé. Lancez un build pour l'utiliser.`)
+    session.flash('success', i18n.t('flash.images.created', { name: template.name }))
     return response.redirect().toRoute('images.show', { id: template.id })
   }
 
@@ -96,7 +96,7 @@ export default class ImageTemplatesController {
     })
   }
 
-  async update({ request, response, params, session }: HttpContext) {
+  async update({ request, response, params, session, i18n }: HttpContext) {
     const template = await ImageTemplate.findOrFail(params.id)
     const payload = await request.validateUsing(updateImageTemplateValidator)
 
@@ -112,22 +112,22 @@ export default class ImageTemplatesController {
       await db.from('image_templates').whereNot('id', template.id).update({ is_default: false })
     }
 
-    session.flash('success', 'Template mis à jour.')
+    session.flash('success', i18n.t('flash.images.updated'))
     return response.redirect().toRoute('images.show', { id: template.id })
   }
 
-  async build({ response, params, session }: HttpContext) {
+  async build({ response, params, session, i18n }: HttpContext) {
     const template = await ImageTemplate.findOrFail(params.id)
 
     if (template.buildStatus === 'building') {
-      session.flash('error', 'Un build est déjà en cours.')
+      session.flash('error', i18n.t('flash.images.build_in_progress'))
       return response.redirect().toRoute('images.show', { id: template.id })
     }
 
     const builder = new ImageBuilderService()
     builder.startBuildAsync(template.id)
 
-    session.flash('success', `Build « ${template.name} » lancé en arrière-plan.`)
+    session.flash('success', i18n.t('flash.images.build_started', { name: template.name }))
     return response.redirect().toRoute('images.show', { id: template.id })
   }
 
@@ -143,16 +143,16 @@ export default class ImageTemplatesController {
     })
   }
 
-  async destroy({ response, params, session }: HttpContext) {
+  async destroy({ response, params, session, i18n }: HttpContext) {
     const template = await ImageTemplate.findOrFail(params.id)
 
     if (template.isBuiltin) {
-      session.flash('error', 'Les templates intégrés ne peuvent pas être supprimés.')
+      session.flash('error', i18n.t('flash.images.builtin_delete_denied'))
       return response.redirect().toRoute('images.index')
     }
 
     await template.delete()
-    session.flash('success', 'Template supprimé.')
+    session.flash('success', i18n.t('flash.images.deleted'))
     return response.redirect().toRoute('images.index')
   }
 }

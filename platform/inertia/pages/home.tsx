@@ -1,20 +1,20 @@
 import PublicLayout from '~/layouts/public'
+import { useI18n } from '~/hooks/use_i18n'
 
 export default function Home() {
+  const { t } = useI18n()
+
   return (
     <PublicLayout>
       <div className="hero">
-        <h1>Dev on the go</h1>
-        <p>
-          Environnements de développement contenairisés avec VS Code dans le navigateur. Déployez,
-          codez et collaborez depuis n&apos;importe où.
-        </p>
+        <h1>{t('messages.home.title')}</h1>
+        <p>{t('messages.home.subtitle')}</p>
         <div className="hero-actions">
           <a href="/login" className="btn btn-primary">
-            Se connecter
+            {t('messages.home.login')}
           </a>
           <a href="/signup" className="btn">
-            Créer un compte
+            {t('messages.home.signup')}
           </a>
         </div>
       </div>

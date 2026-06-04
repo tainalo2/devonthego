@@ -1,5 +1,6 @@
 import AppLayout from '~/layouts/app'
 import { Form, Link } from '@adonisjs/inertia/react'
+import { useI18n } from '~/hooks/use_i18n'
 
 type Webhook = {
   id: number
@@ -15,13 +16,15 @@ type Props = {
 }
 
 export default function WebhooksEdit({ webhook, availableEvents }: Props) {
+  const { t, webhookEventLabel } = useI18n()
+
   return (
     <AppLayout>
       <div className="page">
         <div className="page-header">
-          <h1>Modifier {webhook.name}</h1>
+          <h1>{t('messages.webhooks.editTitle', { name: webhook.name })}</h1>
           <Link route="webhooks.show" routeParams={{ id: webhook.id }}>
-            Retour
+            {t('messages.common.back')}
           </Link>
         </div>
 
@@ -30,23 +33,23 @@ export default function WebhooksEdit({ webhook, availableEvents }: Props) {
             {({ errors }) => (
               <>
                 <label>
-                  Nom
+                  {t('messages.common.name')}
                   <input type="text" name="name" defaultValue={webhook.name} required />
                 </label>
 
                 <label>
-                  URL
+                  {t('messages.common.url')}
                   <input type="url" name="url" defaultValue={webhook.url} required />
                   {errors.url && <span className="error">{errors.url}</span>}
                 </label>
 
                 <label>
-                  Nouveau secret (laisser vide pour conserver)
+                  {t('messages.webhooks.form.newSecret')}
                   <input type="text" name="secret" />
                 </label>
 
                 <fieldset className="checkbox-group">
-                  <legend>Événements</legend>
+                  <legend>{t('messages.webhooks.show.events')}</legend>
                   {availableEvents.map((event) => (
                     <label key={event} className="checkbox">
                       <input
@@ -55,7 +58,7 @@ export default function WebhooksEdit({ webhook, availableEvents }: Props) {
                         value={event}
                         defaultChecked={webhook.events.includes(event)}
                       />
-                      <code>{event}</code>
+                      <code>{event}</code> — {webhookEventLabel(event)}
                     </label>
                   ))}
                 </fieldset>
@@ -67,11 +70,11 @@ export default function WebhooksEdit({ webhook, availableEvents }: Props) {
                     value="1"
                     defaultChecked={webhook.isActive}
                   />
-                  Webhook actif
+                  {t('messages.webhooks.form.activeWebhook')}
                 </label>
 
                 <button type="submit" className="btn btn-primary">
-                  Enregistrer
+                  {t('messages.common.save')}
                 </button>
               </>
             )}

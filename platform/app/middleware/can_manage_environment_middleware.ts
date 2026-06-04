@@ -2,7 +2,7 @@ import type { HttpContext } from '@adonisjs/core/http'
 import type { NextFn } from '@adonisjs/core/types/http'
 
 export default class CanManageEnvironmentMiddleware {
-  async handle({ auth, params, response }: HttpContext, next: NextFn) {
+  async handle({ auth, params, response, i18n }: HttpContext, next: NextFn) {
     const user = auth.user!
     if (user.isAdmin) {
       return next()
@@ -19,7 +19,7 @@ export default class CanManageEnvironmentMiddleware {
       .first()
 
     if (!environment) {
-      return response.forbidden({ error: 'Accès refusé à cet environnement.' })
+      return response.forbidden({ error: i18n.t('messages.errors.env_access_denied') })
     }
 
     return next()

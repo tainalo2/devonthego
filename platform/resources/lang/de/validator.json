@@ -1,0 +1,49 @@
+{
+  "shared": {
+    "fields": {
+      "email": "email",
+      "password": "Passwort",
+      "passwordConfirmation": "Passwortbestätigung",
+      "fullName": "vollständiger Name",
+      "name": "Name",
+      "domain": "Domain",
+      "acmeEmail": "Let's-Encrypt-E-Mail",
+      "adminEmail": "Administrator-E-Mail",
+      "adminFullName": "vollständiger Name des Administrators",
+      "adminPassword": "Administrator-Passwort",
+      "adminPasswordConfirmation": "Passwortbestätigung",
+      "allowPublicSignup": "öffentliche Registrierung",
+      "envCpuLimit": "CPU-Limit",
+      "envMemoryLimit": "Speicherlimit",
+      "imageTemplateId": "Image-Vorlage",
+      "ownerId": "Eigentümer",
+      "cpuLimit": "CPU-Limit",
+      "memoryLimitMb": "Speicherlimit",
+      "assignedUserIds": "zugewiesene Benutzer",
+      "gitRepoUrl": "Git-Repository-URL",
+      "gitBranch": "Git-Branch",
+      "url": "URL",
+      "secret": "secret",
+      "events": "Ereignisse",
+      "isActive": "Aktiv-Status",
+      "role": "Rolle",
+      "description": "Beschreibung",
+      "dockerfile": "Dockerfile",
+      "isDefault": "Standardvorlage"
+    },
+    "messages": {
+      "required": "Das Feld {field} ist erforderlich",
+      "email": "Das Feld {field} muss eine gültige E-Mail-Adresse sein",
+      "minLength": "Das Feld {field} muss mindestens {min} Zeichen haben",
+      "maxLength": "Das Feld {field} darf höchstens {max} Zeichen haben",
+      "confirmed": "Die Bestätigung des Felds {field} stimmt nicht überein",
+      "regex": "Das Format des Felds {field} ist ungültig",
+      "url": "Das Feld {field} muss eine gültige URL sein",
+      "unique": "Das Feld {field} muss eindeutig sein",
+      "number": "Das Feld {field} muss eine Zahl sein",
+      "enum": "Der ausgewählte Wert für {field} ist ungültig",
+      "min": "Das Feld {field} muss mindestens {min} sein",
+      "max": "Das Feld {field} darf höchstens {max} sein"
+    }
+  }
+}

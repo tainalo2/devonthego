@@ -1,27 +1,24 @@
 import PublicLayout from '~/layouts/public'
 import { Form, Link } from '@adonisjs/inertia/react'
+import { useI18n } from '~/hooks/use_i18n'
 
 type Props = {
   bootstrapMode?: boolean
 }
 
 export default function Login({ bootstrapMode = false }: Props) {
+  const { t } = useI18n()
+
   return (
     <PublicLayout>
       <div className="form-container">
         <div>
-          <h1>Connexion</h1>
-          <p>Connectez-vous à votre espace Dev on the go.</p>
+          <h1>{t('messages.auth.login.title')}</h1>
+          <p>{t('messages.auth.login.subtitle')}</p>
           {bootstrapMode && (
             <>
-              <p className="muted">
-                Première installation ? Utilisez les identifiants affichés par <code>install.sh</code>,
-                puis suivez l&apos;assistant de configuration.
-              </p>
-              <p className="muted">
-                Le certificat TLS est <strong>autosigné</strong> — acceptez l&apos;avertissement de
-                sécurité du navigateur pour cette première connexion.
-              </p>
+              <p className="muted">{t('messages.auth.login.bootstrapHint')}</p>
+              <p className="muted">{t('messages.auth.login.tlsHint')}</p>
             </>
           )}
         </div>
@@ -30,13 +27,13 @@ export default function Login({ bootstrapMode = false }: Props) {
           {({ errors }) => (
             <>
               <div>
-                <label htmlFor="email">Email</label>
+                <label htmlFor="email">{t('messages.common.email')}</label>
                 <input type="email" name="email" id="email" autoComplete="username" />
                 {errors.email && <div>{errors.email}</div>}
               </div>
 
               <div>
-                <label htmlFor="password">Mot de passe</label>
+                <label htmlFor="password">{t('messages.common.password')}</label>
                 <input
                   type="password"
                   name="password"
@@ -48,11 +45,12 @@ export default function Login({ bootstrapMode = false }: Props) {
 
               <div>
                 <button type="submit" className="btn btn-primary">
-                  Se connecter
+                  {t('messages.auth.login.submit')}
                 </button>
               </div>
               <p>
-                Pas de compte ? <Link route="new_account.create">S&apos;inscrire</Link>
+                {t('messages.auth.login.noAccount')}{' '}
+                <Link route="new_account.create">{t('messages.auth.login.signupLink')}</Link>
               </p>
             </>
           )}

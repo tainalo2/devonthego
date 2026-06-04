@@ -1,5 +1,6 @@
 import AppLayout from '~/layouts/app'
 import { Form, Link } from '@adonisjs/inertia/react'
+import { useI18n } from '~/hooks/use_i18n'
 
 type Webhook = {
   id: number
@@ -26,6 +27,8 @@ type Props = {
 }
 
 export default function WebhooksShow({ webhook, deliveries }: Props) {
+  const { t, webhookEventLabel } = useI18n()
+
   return (
     <AppLayout>
       <div className="page">
@@ -38,55 +41,53 @@ export default function WebhooksShow({ webhook, deliveries }: Props) {
           </div>
           <div className="actions-row">
             <Link route="webhooks.edit" routeParams={{ id: webhook.id }} className="btn">
-              Modifier
+              {t('messages.common.edit')}
             </Link>
-            <Link route="webhooks.index">Retour</Link>
+            <Link route="webhooks.index">{t('messages.common.back')}</Link>
           </div>
         </div>
 
         <div className="detail-grid">
           <section className="card">
-            <h2>Configuration</h2>
+            <h2>{t('messages.webhooks.show.config')}</h2>
             <dl className="detail-list">
               <div>
-                <dt>Secret (HMAC SHA-256)</dt>
+                <dt>{t('messages.webhooks.show.secret')}</dt>
                 <dd>
                   <code>{webhook.secret}</code>
                 </dd>
               </div>
               <div>
-                <dt>Événements</dt>
+                <dt>{t('messages.webhooks.show.events')}</dt>
                 <dd>
                   {webhook.events.map((e) => (
                     <div key={e}>
-                      <code>{e}</code>
+                      <code>{e}</code> — {webhookEventLabel(e)}
                     </div>
                   ))}
                 </dd>
               </div>
               <div>
-                <dt>Actif</dt>
-                <dd>{webhook.isActive ? 'Oui' : 'Non'}</dd>
+                <dt>{t('messages.webhooks.show.active')}</dt>
+                <dd>{webhook.isActive ? t('messages.common.yes') : t('messages.common.no')}</dd>
               </div>
             </dl>
-            <p className="muted small">
-              Signature envoyée dans l&apos;en-tête <code>X-DOTG-Signature: sha256=…</code>
-            </p>
+            <p className="muted small">{t('messages.webhooks.show.signatureHint')}</p>
           </section>
         </div>
 
         <section className="card">
-          <h2>Dernières livraisons</h2>
+          <h2>{t('messages.webhooks.show.recentDeliveries')}</h2>
           {deliveries.length === 0 ? (
-            <p className="muted">Aucune livraison pour le moment.</p>
+            <p className="muted">{t('messages.webhooks.show.noDeliveries')}</p>
           ) : (
             <table className="table">
               <thead>
                 <tr>
-                  <th>Date</th>
-                  <th>Événement</th>
-                  <th>Statut HTTP</th>
-                  <th>Succès</th>
+                  <th>{t('messages.webhooks.show.deliveryColumns.date')}</th>
+                  <th>{t('messages.webhooks.show.deliveryColumns.event')}</th>
+                  <th>{t('messages.webhooks.show.deliveryColumns.httpStatus')}</th>
+                  <th>{t('messages.webhooks.show.deliveryColumns.success')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -107,7 +108,7 @@ export default function WebhooksShow({ webhook, deliveries }: Props) {
 
         <Form route="webhooks.destroy" routeParams={{ id: webhook.id }} className="danger-zone">
           <button type="submit" className="btn btn-danger">
-            Supprimer le webhook
+            {t('messages.webhooks.show.deleteWebhook')}
           </button>
         </Form>
       </div>

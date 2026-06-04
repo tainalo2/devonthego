@@ -1,0 +1,45 @@
+{
+  "setup": {
+    "admin_only": "Solo un amministratore può completare la configurazione.",
+    "deploy_failed": "Distribuzione fallita: {message}"
+  },
+  "environments": {
+    "created": "Ambiente «{name}» creato.",
+    "create_failed": "Impossibile creare l'ambiente.",
+    "permission_denied": "Permesso negato.",
+    "updated": "Ambiente aggiornato.",
+    "update_failed": "Aggiornamento fallito.",
+    "assignments_updated": "Utenti assegnati aggiornati.",
+    "started": "Ambiente avviato.",
+    "start_failed": "Avvio fallito.",
+    "stopped": "Ambiente arrestato.",
+    "stop_failed": "Arresto fallito.",
+    "deleted": "Ambiente eliminato.",
+    "delete_failed": "Eliminazione fallita.",
+    "credentials_regenerated": "Credenziali rigenerate.",
+    "regenerate_failed": "Rigenerazione fallita."
+  },
+  "account": {
+    "setup_required": "Completa la configurazione iniziale prima di creare un account.",
+    "signup_disabled": "La registrazione pubblica è disabilitata."
+  },
+  "webhooks": {
+    "created": "Webhook creato.",
+    "updated": "Webhook aggiornato.",
+    "deleted": "Webhook eliminato."
+  },
+  "images": {
+    "created": "Modello «{name}» creato. Avvia un build per usarlo.",
+    "updated": "Modello aggiornato.",
+    "build_in_progress": "Un build è già in corso.",
+    "build_started": "Build «{name}» avviato in background.",
+    "builtin_delete_denied": "I modelli integrati non possono essere eliminati.",
+    "deleted": "Modello eliminato."
+  },
+  "users": {
+    "created": "Utente creato.",
+    "updated": "Utente aggiornato.",
+    "cannot_delete_self": "Non puoi eliminare il tuo account.",
+    "deleted": "Utente eliminato."
+  }
+}

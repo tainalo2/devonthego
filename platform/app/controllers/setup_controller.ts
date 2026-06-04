@@ -22,11 +22,11 @@ export default class SetupController {
     })
   }
 
-  async store({ request, auth, response, session, inertia }: HttpContext) {
+  async store({ request, auth, response, session, inertia, i18n }: HttpContext) {
     const user = auth.user!
 
     if (user.role !== 'admin') {
-      session.flash('error', 'Seul un administrateur peut finaliser la configuration.')
+      session.flash('error', i18n.t('flash.setup.admin_only'))
       return response.redirect().back()
     }
 
@@ -49,8 +49,8 @@ export default class SetupController {
 
       return inertia.render('setup/complete', { appUrl })
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Erreur inconnue'
-      session.flash('error', `Échec du déploiement : ${message}`)
+      const message = error instanceof Error ? error.message : i18n.t('messages.common.error')
+      session.flash('error', i18n.t('flash.setup.deploy_failed', { message }))
       return response.redirect().back()
     }
   }

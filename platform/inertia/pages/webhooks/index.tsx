@@ -1,5 +1,6 @@
 import AppLayout from '~/layouts/app'
 import { Link } from '@adonisjs/inertia/react'
+import { useI18n } from '~/hooks/use_i18n'
 
 type WebhookItem = {
   id: number
@@ -16,30 +17,30 @@ type Props = {
 }
 
 export default function WebhooksIndex({ webhooks }: Props) {
+  const { t } = useI18n()
+
   return (
     <AppLayout>
       <div className="page">
         <div className="page-header">
-          <h1>Webhooks</h1>
+          <h1>{t('messages.webhooks.title')}</h1>
           <Link route="webhooks.create" className="btn btn-primary">
-            Nouveau webhook
+            {t('messages.webhooks.new')}
           </Link>
         </div>
 
         <section className="card">
-          <p className="muted">
-            Recevez des notifications HTTP lors des changements d&apos;état des environnements.
-          </p>
+          <p className="muted">{t('messages.webhooks.hint')}</p>
           {webhooks.length === 0 ? (
-            <p className="muted">Aucun webhook configuré.</p>
+            <p className="muted">{t('messages.webhooks.none')}</p>
           ) : (
             <table className="table">
               <thead>
                 <tr>
-                  <th>Nom</th>
-                  <th>URL</th>
-                  <th>Événements</th>
-                  <th>Actif</th>
+                  <th>{t('messages.webhooks.columns.name')}</th>
+                  <th>{t('messages.webhooks.columns.url')}</th>
+                  <th>{t('messages.webhooks.columns.events')}</th>
+                  <th>{t('messages.webhooks.columns.active')}</th>
                   <th></th>
                 </tr>
               </thead>
@@ -50,11 +51,11 @@ export default function WebhooksIndex({ webhooks }: Props) {
                     <td>
                       <code>{webhook.url}</code>
                     </td>
-                    <td>{webhook.events.length} événement(s)</td>
-                    <td>{webhook.isActive ? 'Oui' : 'Non'}</td>
+                    <td>{t('messages.webhooks.eventCount', { count: webhook.events.length })}</td>
+                    <td>{webhook.isActive ? t('messages.common.yes') : t('messages.common.no')}</td>
                     <td>
                       <Link route="webhooks.show" routeParams={{ id: webhook.id }}>
-                        Détails
+                        {t('messages.common.details')}
                       </Link>
                     </td>
                   </tr>

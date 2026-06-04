@@ -1,0 +1,49 @@
+{
+  "shared": {
+    "fields": {
+      "email": "email",
+      "password": "contraseña",
+      "passwordConfirmation": "confirmación de contraseña",
+      "fullName": "nombre completo",
+      "name": "nombre",
+      "domain": "dominio",
+      "acmeEmail": "email Let's Encrypt",
+      "adminEmail": "email del administrador",
+      "adminFullName": "nombre completo del administrador",
+      "adminPassword": "contraseña del administrador",
+      "adminPasswordConfirmation": "confirmación de contraseña",
+      "allowPublicSignup": "registro público",
+      "envCpuLimit": "límite de CPU",
+      "envMemoryLimit": "límite de memoria",
+      "imageTemplateId": "plantilla de imagen",
+      "ownerId": "propietario",
+      "cpuLimit": "límite de CPU",
+      "memoryLimitMb": "límite de memoria",
+      "assignedUserIds": "usuarios asignados",
+      "gitRepoUrl": "URL del repositorio Git",
+      "gitBranch": "rama Git",
+      "url": "URL",
+      "secret": "secret",
+      "events": "eventos",
+      "isActive": "estado activo",
+      "role": "rol",
+      "description": "descripción",
+      "dockerfile": "Dockerfile",
+      "isDefault": "plantilla predeterminada"
+    },
+    "messages": {
+      "required": "El campo {field} es obligatorio",
+      "email": "El campo {field} debe ser un email válido",
+      "minLength": "El campo {field} debe tener al menos {min} caracteres",
+      "maxLength": "El campo {field} no debe superar {max} caracteres",
+      "confirmed": "La confirmación del campo {field} no coincide",
+      "regex": "El formato del campo {field} no es válido",
+      "url": "El campo {field} debe ser una URL válida",
+      "unique": "El campo {field} debe ser único",
+      "number": "El campo {field} debe ser un número",
+      "enum": "El valor seleccionado de {field} no es válido",
+      "min": "El campo {field} debe ser al menos {min}",
+      "max": "El campo {field} no debe superar {max}"
+    }
+  }
+}

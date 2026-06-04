@@ -1,0 +1,365 @@
+{
+  "app": {
+    "name": "Dev on the go",
+    "tagline": "Containerisierte Entwicklungsumgebungen mit VS Code im Browser. Bereitstellen, codieren und überall zusammenarbeiten."
+  },
+  "common": {
+    "save": "Speichern",
+    "cancel": "Abbrechen",
+    "back": "Zurück",
+    "delete": "Löschen",
+    "edit": "Bearbeiten",
+    "create": "Erstellen",
+    "details": "Details",
+    "email": "Email",
+    "password": "Passwort",
+    "name": "Name",
+    "fullName": "Vollständiger Name",
+    "language": "Sprache",
+    "yes": "Ja",
+    "no": "Nein",
+    "none": "Keine",
+    "actions": "Actions",
+    "loading": "Wird geladen…",
+    "open": "Öffnen",
+    "description": "Description",
+    "status": "Status",
+    "url": "URL",
+    "owner": "Eigentümer",
+    "resources": "Ressourcen",
+    "active": "Aktiv",
+    "role": "Rolle",
+    "previous": "Zurück",
+    "next": "Weiter",
+    "confirm": "Confirm",
+    "optional": "optional",
+    "required": "Erforderlich",
+    "error": "Error",
+    "success": "Erfolg",
+    "online": "Online",
+    "offline": "Offline",
+    "custom": "Custom",
+    "branch": "Branch",
+    "user": "Benutzer",
+    "username": "Benutzername",
+    "emDash": "—",
+    "builtin": "integriert"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "environments": "Umgebungen",
+    "users": "Benutzer",
+    "images": "Images",
+    "webhooks": "Webhooks",
+    "settings": "Einstellungen",
+    "login": "Anmelden",
+    "signup": "Registrieren",
+    "logout": "Abmelden"
+  },
+  "home": {
+    "title": "Dev on the go",
+    "subtitle": "Containerisierte Entwicklungsumgebungen mit VS Code im Browser. Bereitstellen, codieren und überall zusammenarbeiten.",
+    "login": "Anmelden",
+    "signup": "Konto erstellen"
+  },
+  "auth": {
+    "login": {
+      "title": "Anmelden",
+      "subtitle": "Melden Sie sich in Ihrem Dev-on-the-go-Bereich an.",
+      "bootstrapHint": "Erstinstallation? Verwenden Sie die von install.sh angezeigten Zugangsdaten und folgen Sie dem Einrichtungsassistenten.",
+      "tlsHint": "Das TLS-Zertifikat ist selbstsigniert — akzeptieren Sie die Browser-Sicherheitswarnung bei dieser ersten Verbindung.",
+      "submit": "Anmelden",
+      "noAccount": "Noch kein Konto?",
+      "signupLink": "Registrieren"
+    },
+    "signup": {
+      "title": "Registrieren",
+      "subtitle": "Erstellen Sie Ihr Dev-on-the-go-Konto.",
+      "passwordConfirmation": "Passwort bestätigen",
+      "submit": "Registrieren",
+      "hasAccount": "Bereits ein Konto?",
+      "loginLink": "Anmelden"
+    }
+  },
+  "setup": {
+    "title": "Ersteinrichtung",
+    "welcome": "Willkommen bei Dev on the go. Schließen Sie diese Einrichtung ab, um HTTPS zu aktivieren und die Plattform in Produktion bereitzustellen.",
+    "bootstrapAccess": "Bootstrap-Zugang (selbstsigniertes HTTPS):",
+    "certHint": "Akzeptieren Sie die Browser-Zertifikatswarnung — Formulardaten werden bei der Übertragung verschlüsselt.",
+    "steps": {
+      "domain": "Domain & TLS",
+      "admin": "Administrator",
+      "resources": "Ressourcen",
+      "confirmation": "Bestätigung"
+    },
+    "stepsAria": "Schritte",
+    "domain": {
+      "title": "Domain & TLS-Zertifikate",
+      "hint": "Die Domain muss auf diesen Server zeigen (A-DNS-Eintrag). Let's-Encrypt-Zertifikate werden automatisch erstellt.",
+      "domainLabel": "Primäre Domain",
+      "acmeEmailLabel": "Let's-Encrypt-E-Mail",
+      "adminUrlHint": "Admin-URL nach der Einrichtung:"
+    },
+    "admin": {
+      "title": "Administratorkonto",
+      "hint": "Ersetzt temporäre Bootstrap-Zugangsdaten durch Ihr dauerhaftes Konto.",
+      "allowPublicSignup": "Öffentliche Registrierung erlauben"
+    },
+    "resources": {
+      "title": "Limits pro Umgebung",
+      "cpuLabel": "CPU (Kerne)",
+      "memoryLabel": "Speicher (z. B. 1024m, 2g)"
+    },
+    "confirmation": {
+      "title": "Bestätigung",
+      "body": "Die Plattform schreibt die Konfiguration, erstellt Traefik mit HTTPS neu und startet neu. Dies dauert etwa 30 Sekunden.",
+      "checkDns": "Stellen Sie sicher, dass DNS auf diesen Server zeigt",
+      "checkPorts": "Die Ports 80 und 443 müssen geöffnet sein",
+      "checkLogout": "Sie werden abgemeldet und müssen sich unter der neuen URL erneut anmelden"
+    },
+    "deploy": "Plattform bereitstellen",
+    "deploying": "Wird bereitgestellt…"
+  },
+  "setupComplete": {
+    "title": "Einrichtung läuft",
+    "body": "Die Plattform startet im Produktionsmodus mit TLS-Zertifikaten neu. Dies dauert etwa 30 bis 60 Sekunden.",
+    "reconnect": "Melden Sie sich anschließend an unter:",
+    "useAdminCredentials": "Verwenden Sie die E-Mail und das Passwort aus dem Administrator-Schritt",
+    "letsEncryptDelay": "Das Let's-Encrypt-Zertifikat kann eine zusätzliche Minute benötigen"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "newEnvironment": "Neue Umgebung",
+    "stats": {
+      "environments": "Umgebungen",
+      "running": "Aktiv",
+      "users": "Benutzer",
+      "docker": "Docker"
+    },
+    "recentEnvironments": "Neueste Umgebungen",
+    "noEnvironments": "Noch keine Umgebungen.",
+    "columns": {
+      "name": "Name",
+      "status": "Status",
+      "url": "URL",
+      "owner": "Eigentümer"
+    }
+  },
+  "environments": {
+    "title": "Umgebungen",
+    "new": "Neue Umgebung",
+    "none": "Keine Umgebungen.",
+    "columns": {
+      "name": "Name",
+      "status": "Status",
+      "image": "Image",
+      "owner": "Eigentümer",
+      "resources": "Ressourcen"
+    },
+    "create": {
+      "title": "Neue Umgebung",
+      "imageTemplate": "Image-Vorlage",
+      "owner": "Eigentümer",
+      "myself": "Ich selbst",
+      "assignedUsers": "Zugewiesene Benutzer (gemeinsamer Zugriff)",
+      "cpu": "CPU (cores)",
+      "ram": "RAM (MB)",
+      "gitImport": "Git-Import (optional)",
+      "gitRepoUrl": "Repository-URL",
+      "gitBranch": "Branch",
+      "gitHint": "Das Repository wird beim ersten Start in den Workspace geklont (falls leer).",
+      "submit": "Umgebung erstellen"
+    },
+    "edit": {
+      "title": "{name} bearbeiten",
+      "currentStatus": "Aktueller Status:",
+      "resourceHint": "eine Änderung von CPU/RAM erstellt den Container neu, wenn er läuft.",
+      "gitRepoUrl": "Git-Repository-URL (optional)",
+      "gitBranch": "Git-Branch"
+    },
+    "show": {
+      "information": "Informationen",
+      "dockerImage": "Docker-Image",
+      "assignedUsers": "Zugewiesene Benutzer",
+      "git": "Git",
+      "branch": "Branch:",
+      "error": "Error",
+      "start": "Starten",
+      "stop": "Stoppen",
+      "regenerateCredentials": "Zugangsdaten neu generieren",
+      "delete": "Löschen",
+      "basicAuth": "Authentifizierung (Basic Auth)",
+      "credentialsHint": "Zugangsdaten werden nur bei Erstellung oder nach Regenerierung angezeigt.",
+      "assignUsers": "Benutzer zuweisen",
+      "saveAssignments": "Zuweisungen speichern",
+      "platformLog": "Plattform-Protokoll",
+      "noEvents": "Keine Ereignisse.",
+      "dockerLogs": "Docker-Logs (letzte 100 Zeilen)"
+    }
+  },
+  "images": {
+    "title": "Docker-Images",
+    "new": "Neue Vorlage",
+    "registryHint": "Lokale Registry: Images für Ihre Entwicklungsumgebungen.",
+    "columns": {
+      "name": "Name",
+      "dockerImage": "Docker-Image",
+      "build": "Build",
+      "default": "Standard"
+    },
+    "buildStatus": {
+      "idle": "Nicht gebaut",
+      "building": "Build läuft",
+      "success": "Bereit",
+      "error": "Fehler"
+    },
+    "create": {
+      "title": "Neue Image-Vorlage",
+      "dockerfile": "Dockerfile",
+      "isDefault": "Standardvorlage",
+      "submit": "Vorlage erstellen"
+    },
+    "edit": {
+      "title": "{name} bearbeiten"
+    },
+    "show": {
+      "buildStatus": "Build-Status",
+      "lastBuild": "Letzter Build",
+      "autoRefresh": " — automatische Aktualisierung…",
+      "buildInProgress": "Build läuft…",
+      "triggerBuild": "Docker-Build starten",
+      "information": "Informationen",
+      "isDefault": "Standardvorlage",
+      "isBuiltin": "Integriert",
+      "buildLog": "Build-Protokoll",
+      "dockerfile": "Dockerfile",
+      "delete": "Vorlage löschen"
+    }
+  },
+  "users": {
+    "title": "Benutzer",
+    "new": "Neuer Benutzer",
+    "columns": {
+      "email": "Email",
+      "name": "Name",
+      "role": "Rolle",
+      "active": "Aktiv"
+    },
+    "create": {
+      "title": "Neuer Benutzer",
+      "activeAccount": "Aktives Konto",
+      "roles": {
+        "user": "Benutzer",
+        "admin": "Administrator"
+      }
+    },
+    "edit": {
+      "title": "{email} bearbeiten",
+      "newPassword": "Neues Passwort (optional)",
+      "delete": "Benutzer löschen"
+    }
+  },
+  "webhooks": {
+    "title": "Webhooks",
+    "new": "Neuer Webhook",
+    "hint": "Erhalten Sie HTTP-Benachrichtigungen bei Änderungen des Umgebungsstatus.",
+    "none": "Keine Webhooks konfiguriert.",
+    "columns": {
+      "name": "Name",
+      "url": "URL",
+      "events": "Ereignisse",
+      "active": "Aktiv"
+    },
+    "eventCount": "{count} Ereignis(se)",
+    "create": {
+      "title": "Neuer Webhook",
+      "destinationUrl": "Ziel-URL",
+      "secret": "Secret (optional — wird automatisch generiert, wenn leer)",
+      "eventsLegend": "Zu überwachende Ereignisse",
+      "active": "Webhook aktiv"
+    },
+    "edit": {
+      "title": "{name} bearbeiten",
+      "newSecret": "Neues Secret (leer lassen zum Beibehalten)",
+      "eventsLegend": "Ereignisse"
+    },
+    "show": {
+      "configuration": "Konfiguration",
+      "secret": "Secret (HMAC SHA-256)",
+      "events": "Ereignisse",
+      "active": "Active",
+      "signatureHint": "Signatur wird im Header gesendet",
+      "deliveries": "Letzte Zustellungen",
+      "noDeliveries": "Noch keine Zustellungen.",
+      "columns": {
+        "date": "Datum",
+        "event": "Ereignis",
+        "httpStatus": "HTTP-Status",
+        "success": "Erfolg"
+      },
+      "delete": "Webhook löschen"
+    },
+    "events": {
+      "environment.created": "Umgebung erstellt",
+      "environment.started": "Umgebung gestartet",
+      "environment.stopped": "Umgebung gestoppt",
+      "environment.error": "Umgebungsfehler",
+      "environment.updated": "Umgebung aktualisiert",
+      "environment.deleted": "Umgebung gelöscht"
+    }
+  },
+  "settings": {
+    "title": "Plattform-Einstellungen",
+    "envHint": "Konfiguration aus Umgebungsvariablen gelesen. Bearbeiten Sie die .env-Datei und starten Sie die Plattform neu, um Änderungen anzuwenden.",
+    "domain": "Domain",
+    "adminUrl": "Admin-URL",
+    "dockerNetwork": "Docker-Netzwerk",
+    "localRegistry": "Lokale Registry",
+    "workspacePath": "Workspace-Pfad",
+    "defaultCpu": "Standard-CPU",
+    "defaultRam": "Standard-RAM",
+    "database": "Datenbank",
+    "publicSignup": "Öffentliche Registrierung",
+    "enabled": "Aktiviert",
+    "disabled": "Deaktiviert",
+    "maintenance": "Wartung",
+    "cronHint": "Empfohlener Cron-Befehl zur Synchronisierung der Docker-Status:",
+    "cores": "core(s)"
+  },
+  "errors": {
+    "not_found": "Seite nicht gefunden",
+    "server_error": "Etwas ist schiefgelaufen",
+    "admin_only": "Zugriff nur für Administratoren.",
+    "env_access_denied": "Zugriff auf diese Umgebung verweigert."
+  },
+  "status": {
+    "creating": "Wird erstellt",
+    "running": "Läuft",
+    "stopped": "Gestoppt",
+    "stopping": "Wird gestoppt",
+    "error": "Error",
+    "deleting": "Wird gelöscht",
+    "building": "Build läuft",
+    "idle": "Leerlauf",
+    "success": "Success",
+    "failed": "Fehlgeschlagen"
+  },
+  "seeder": {
+    "base": {
+      "name": "Base",
+      "description": "OpenVSCode Server mit Basistools"
+    },
+    "node": {
+      "name": "Node.js",
+      "description": "Node.js 24, pnpm, ESLint, Prettier"
+    },
+    "python": {
+      "name": "Python",
+      "description": "Python 3, Ruff, Python-Erweiterung"
+    },
+    "php": {
+      "name": "PHP",
+      "description": "PHP 8, Composer, Intelephense"
+    }
+  }
+}

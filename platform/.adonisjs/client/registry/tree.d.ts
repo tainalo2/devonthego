@@ -16,6 +16,9 @@ export interface ApiDefinition {
     index: typeof routes['setup.index']
     store: typeof routes['setup.store']
   }
+  locale: {
+    update: typeof routes['locale.update']
+  }
   dashboard: {
     index: typeof routes['dashboard.index']
   }

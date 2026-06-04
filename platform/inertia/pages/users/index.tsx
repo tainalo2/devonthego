@@ -1,5 +1,6 @@
 import AppLayout from '~/layouts/app'
 import { Link } from '@adonisjs/inertia/react'
+import { useI18n } from '~/hooks/use_i18n'
 
 type UserItem = {
   id: number
@@ -15,13 +16,15 @@ type Props = {
 }
 
 export default function UsersIndex({ users }: Props) {
+  const { t, roleLabel } = useI18n()
+
   return (
     <AppLayout>
       <div className="page">
         <div className="page-header">
-          <h1>Utilisateurs</h1>
+          <h1>{t('messages.users.title')}</h1>
           <Link route="users.create" className="btn btn-primary">
-            Nouvel utilisateur
+            {t('messages.users.new')}
           </Link>
         </div>
 
@@ -29,10 +32,10 @@ export default function UsersIndex({ users }: Props) {
           <table className="table">
             <thead>
               <tr>
-                <th>Email</th>
-                <th>Nom</th>
-                <th>Rôle</th>
-                <th>Actif</th>
+                <th>{t('messages.users.columns.email')}</th>
+                <th>{t('messages.users.columns.name')}</th>
+                <th>{t('messages.users.columns.role')}</th>
+                <th>{t('messages.users.columns.active')}</th>
                 <th></th>
               </tr>
             </thead>
@@ -42,12 +45,12 @@ export default function UsersIndex({ users }: Props) {
                   <td>{user.email}</td>
                   <td>{user.fullName ?? '—'}</td>
                   <td>
-                    <span className={`badge badge-${user.role}`}>{user.role}</span>
+                    <span className={`badge badge-${user.role}`}>{roleLabel(user.role)}</span>
                   </td>
-                  <td>{user.isActive ? 'Oui' : 'Non'}</td>
+                  <td>{user.isActive ? t('messages.common.yes') : t('messages.common.no')}</td>
                   <td>
                     <Link route="users.edit" routeParams={{ id: user.id }}>
-                      Modifier
+                      {t('messages.common.edit')}
                     </Link>
                   </td>
                 </tr>

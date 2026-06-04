@@ -5,9 +5,9 @@ import { signupValidator } from '#validators/user'
 import type { HttpContext } from '@adonisjs/core/http'
 
 export default class NewAccountController {
-  async create({ inertia, response, session }: HttpContext) {
+  async create({ inertia, response, session, i18n }: HttpContext) {
     if (!(await SetupService.isCompleted())) {
-      session.flash('error', 'Terminez la configuration initiale avant de créer un compte.')
+      session.flash('error', i18n.t('flash.account.setup_required'))
       return response.redirect().toRoute('session.create')
     }
 
@@ -22,9 +22,9 @@ export default class NewAccountController {
     return inertia.render('auth/signup', {})
   }
 
-  async store({ request, response, auth, session }: HttpContext) {
+  async store({ request, response, auth, session, i18n }: HttpContext) {
     if (!(await SetupService.isCompleted())) {
-      session.flash('error', 'Terminez la configuration initiale avant de créer un compte.')
+      session.flash('error', i18n.t('flash.account.setup_required'))
       return response.redirect().toRoute('session.create')
     }
 
@@ -33,7 +33,7 @@ export default class NewAccountController {
     const hasUsers = Number(usersCount[0]?.$extras?.total ?? 0) > 0
 
     if (!allowPublicSignup && hasUsers) {
-      session.flash('error', "L'inscription publique est désactivée.")
+      session.flash('error', i18n.t('flash.account.signup_disabled'))
       return response.redirect().toRoute('session.create')
     }
 

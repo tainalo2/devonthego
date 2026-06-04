@@ -1,13 +1,16 @@
 import AppLayout from '~/layouts/app'
 import { Form, Link } from '@adonisjs/inertia/react'
+import { useI18n } from '~/hooks/use_i18n'
 
 export default function UsersCreate() {
+  const { t, roleLabel } = useI18n()
+
   return (
     <AppLayout>
       <div className="page">
         <div className="page-header">
-          <h1>Nouvel utilisateur</h1>
-          <Link route="users.index">Retour</Link>
+          <h1>{t('messages.users.createTitle')}</h1>
+          <Link route="users.index">{t('messages.common.back')}</Link>
         </div>
 
         <section className="card form-card">
@@ -15,32 +18,32 @@ export default function UsersCreate() {
             {({ errors }) => (
               <>
                 <label>
-                  Nom complet
+                  {t('messages.users.form.fullName')}
                   <input type="text" name="fullName" />
                 </label>
                 <label>
-                  Email
+                  {t('messages.common.email')}
                   <input type="email" name="email" required />
                   {errors.email && <span className="error">{errors.email}</span>}
                 </label>
                 <label>
-                  Mot de passe
+                  {t('messages.users.form.password')}
                   <input type="password" name="password" required />
                   {errors.password && <span className="error">{errors.password}</span>}
                 </label>
                 <label>
-                  Rôle
+                  {t('messages.users.form.role')}
                   <select name="role" defaultValue="user">
-                    <option value="user">Utilisateur</option>
-                    <option value="admin">Administrateur</option>
+                    <option value="user">{roleLabel('user')}</option>
+                    <option value="admin">{roleLabel('admin')}</option>
                   </select>
                 </label>
                 <label className="checkbox">
                   <input type="checkbox" name="isActive" value="1" defaultChecked />
-                  Compte actif
+                  {t('messages.users.form.activeAccount')}
                 </label>
                 <button type="submit" className="btn btn-primary">
-                  Créer
+                  {t('messages.common.create')}
                 </button>
               </>
             )}
